@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#315b17">
+  <script>
+    const pageRoute = window.location.pathname.replace(/\/+$/, "") || "/";
+    document.documentElement.dataset.page = ({
+      "/": "home", "/index.html": "home", "/home": "home",
+      "/about": "about", "/products": "products", "/blog": "blog", "/contact": "contact",
+      "/signin": "signin", "/signup": "signup"
+    })[pageRoute] || "home";
+  </script>
+  <title>Fresh Vegbox</title>
+  <meta name="description" content="Shop fresh vegetables from Fresh Vegbox. Browse seasonal produce and find farm-fresh favorites for your kitchen.">
+  <link rel="icon" type="image/png" href="assets/fresh-vegbox-favicon.png">
+  <style>
+    :root {
+      color-scheme: light;
+      --green: #315b17;
+      --green-dark: #24460f;
+      --red: #d51224;
+      --ink: #20231f;
+      --muted: #777b75;
+      --line: #e8e9e5;
+      --surface: #fff;
+      --page: #fafaf9;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--page); font: 14px/1.45 Arial, Helvetica, sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    .wrap { width: min(1320px, calc(100% - 48px)); margin-inline: auto; }
+
+    .site-header { background: white; }
+    .topbar { min-height: 88px; display: flex; align-items: center; gap: 30px; }
+    .brand { display: inline-flex; align-items: center; flex: 0 0 auto; }
+    .brand-logo { display: block; width: 185px; height: 84px; object-fit: contain; }
+    .header-search {
+      width: min(460px, 42vw);
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-inline: auto;
+      padding: 0 13px;
+      color: #858b83;
+      border: 1px solid #e4e6e2;
+      border-radius: 7px;
+      background: #fff;
+    }
+    .header-search:focus-within { border-color: #9db58b; box-shadow: 0 0 0 3px #315b1710; }
+    .header-search svg { flex: 0 0 auto; }
+    .header-search input { width: 100%; padding: 0; color: var(--ink); border: 0; outline: 0; background: transparent; font-size: 13px; }
+    .header-search input::placeholder { color: #858b83; }
+    .header-actions { display: flex; align-items: center; gap: 17px; }
+    .icon-button {
+      min-width: 32px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 5px;
+      color: var(--red);
+      background: transparent;
+      border: 0;
+    }
+    .cart-count { min-width: 19px; height: 19px; display: grid; place-items: center; padding-inline: 5px; color: white; background: var(--red); border-radius: 20px; font-size: 11px; }
+    .category-nav { background: var(--green); color: white; }
+    .nav-links { min-height: 40px; display: flex; align-items: center; justify-content: center; gap: clamp(18px, 4vw, 48px); white-space: nowrap; }
+    .nav-links a { position: relative; padding: 11px 0; color: #f5f7f2; font-size: 12px; }
+    .nav-links a:hover, .nav-links a[aria-current="page"] { color: #fff; }
+    .nav-links a[aria-current="page"]::after { position: absolute; right: 0; bottom: 5px; left: 0; height: 2px; background: #e7f2cf; content: ""; }
+    .nav-dropdown { position: relative; display: flex; align-items: center; gap: 5px; }
+    .nav-dropdown-toggle { display: none; }
+    .products-submenu { position: absolute; top: 100%; left: -14px; z-index: 5; min-width: 220px; display: none; gap: 2px; padding: 8px; background: white; border: 1px solid var(--line); border-radius: 0 0 8px 8px; box-shadow: 0 10px 24px #17200f20; white-space: normal; }
+    .nav-dropdown:hover .products-submenu, .nav-dropdown:focus-within .products-submenu { display: grid; }
+    .nav-links .products-submenu a { display: block; padding: 9px 10px; color: #30362e; border-radius: 4px; }
+    .nav-links .products-submenu a:hover, .nav-links .products-submenu a[aria-current="page"] { color: var(--green-dark); background: #f0f5e9; }
+    .nav-links .products-submenu a[aria-current="page"]::after { display: none; }
+    .nav-links :focus-visible { outline: 2px solid #e7f2cf; outline-offset: 3px; }
+    html[data-page="home"] .about-section, html[data-page="home"] .products-section, html[data-page="home"] .blog-section, html[data-page="home"] .contact-section,
+    html[data-page="about"] .home-section, html[data-page="about"] .products-section, html[data-page="about"] .blog-section, html[data-page="about"] .contact-section,
+    html[data-page="products"] .home-section, html[data-page="products"] .about-section, html[data-page="products"] .blog-section, html[data-page="products"] .contact-section,
+    html[data-page="blog"] .home-section, html[data-page="blog"] .about-section, html[data-page="blog"] .products-section, html[data-page="blog"] .contact-section,
+    html[data-page="contact"] .home-section, html[data-page="contact"] .about-section, html[data-page="contact"] .products-section, html[data-page="contact"] .blog-section { display: none; }
+    html[data-page="signin"] body > :not(#accountDialog):not(#toast),
+    html[data-page="signup"] body > :not(#accountDialog):not(#toast) { display: none; }
+    html[data-page="signin"] .account-dialog[open], html[data-page="signup"] .account-dialog[open] {
+      position: fixed; inset: 0; width: min(480px, calc(100% - 32px)); max-height: min(88vh, 760px);
+      margin: auto; overflow: auto; border: 1px solid var(--line); border-radius: 12px;
+      box-shadow: 0 22px 80px #15200f24;
+    }
+    html[data-page="signin"] .account-dialog::backdrop, html[data-page="signup"] .account-dialog::backdrop { background: transparent; backdrop-filter: none; }
+    html[data-page="signin"] .account-dialog .dialog-tabs, html[data-page="signup"] .account-dialog .dialog-tabs,
+    html[data-page="signin"] #signupPanel, html[data-page="signup"] #loginPanel, html[data-page="signup"] #subscribePanel { display: none; }
+    html[data-page="signin"] #closeAccountDialog, html[data-page="signup"] #closeAccountDialog { display: none; }
+    .auth-switch { margin: 3px 0 0; color: #62685f; font-size: 12px; text-align: center; }
+    .auth-switch a { color: var(--green); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+    .home-hero, .about-hero { position: relative; height: clamp(330px, 43vw, 520px); overflow: hidden; color: white; background: #26351f; }
+    .hero-slides, .hero-slide { position: absolute; inset: 0; }
+    .hero-slide { visibility: hidden; opacity: 0; transition: opacity .65s ease, visibility .65s ease; }
+    .hero-slide[hidden] { display: none; }
+    .hero-slide[aria-hidden="false"] { visibility: visible; opacity: 1; }
+    .hero-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #10200dcc 0%, #10200d85 48%, #10200d12 100%); }
+    .hero-copy { position: absolute; top: 50%; left: max(82px, calc((100vw - 1320px) / 2)); width: min(590px, calc(100% - 164px)); transform: translateY(-50%); }
+    .hero-eyebrow { margin: 0 0 12px; color: #e1efc9; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .hero-copy h2 { margin: 0 0 13px; font-size: clamp(34px, 5vw, 60px); line-height: 1.05; letter-spacing: -1.5px; }
+    .hero-copy p { max-width: 500px; margin: 0; color: #f1f3ed; font-size: clamp(14px, 1.5vw, 18px); line-height: 1.65; }
+    .hero-cta { min-height: 44px; display: inline-flex; align-items: center; margin-top: 23px; padding: 0 19px; color: var(--green-dark); background: white; border-radius: 6px; font-weight: 700; }
+    .hero-cta:hover { background: #edf4e4; }
+    .hero-control { position: absolute; top: 50%; z-index: 1; width: 42px; height: 42px; display: grid; place-items: center; padding: 0; color: white; background: #17231580; border: 1px solid #ffffff80; border-radius: 50%; font-size: 25px; line-height: 1; transform: translateY(-50%); }
+    .hero-control:hover { background: #172315c9; }
+    .hero-control-prev { left: 22px; }
+    .hero-control-next { right: 22px; }
+    .hero-dots { position: absolute; bottom: 19px; left: 50%; z-index: 1; display: flex; align-items: center; gap: 9px; transform: translateX(-50%); }
+    .hero-dot { width: 9px; height: 9px; padding: 0; background: #ffffff80; border: 0; border-radius: 50%; }
+    .hero-dot[aria-pressed="true"] { width: 24px; background: white; border-radius: 8px; }
+    .hero-autoplay-toggle { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; color: white; background: #17231580; border: 1px solid #ffffff80; border-radius: 50%; font-size: 13px; }
+    .hero-autoplay-toggle[hidden] { display: none; }
+
+    .breadcrumbs { padding: 24px 0 19px; color: #666d63; font-size: 12px; }
+    .breadcrumbs a:hover { color: var(--green); text-decoration: underline; }
+    .crumb-separator { padding-inline: 6px; color: #a4aaa1; }
+    .home-intro { margin: 0 0 22px; padding: clamp(22px, 4vw, 42px); background: #f0f5e9; border: 1px solid #e4ecd9; border-radius: 10px; }
+    .home-intro h1 { margin: 0 0 12px; color: var(--green-dark); font-size: clamp(23px, 3vw, 32px); letter-spacing: -.6px; }
+    .home-intro p { max-width: 930px; margin: 0; color: #454d40; font-size: 15px; line-height: 1.8; }
+    .catalog-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 22px; padding-bottom: 64px; }
+    .filters {
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+    }
+    .filters-heading { display: flex; align-items: center; justify-content: space-between; padding: 14px 13px; border-bottom: 1px solid var(--line); }
+    .filters-heading strong { font-size: 14px; }
+    .clear-button { padding: 3px 0; color: var(--muted); background: none; border: 0; font-size: 11px; }
+    .clear-button:hover { color: var(--red); }
+    .filter-group { padding: 12px 13px 14px; border-bottom: 1px solid var(--line); }
+    .filter-group:last-child { border-bottom: 0; }
+    .filter-title { margin: 0 0 10px; font-size: 12px; font-weight: 700; }
+    .filter-options { display: grid; gap: 9px; }
+    .filter-option { display: flex; align-items: center; gap: 8px; color: #454a43; font-size: 11px; cursor: pointer; }
+    .filter-option input { width: 14px; height: 14px; margin: 0; accent-color: var(--red); }
+    .filter-option small { color: #969b94; font-size: 10px; }
+    .price-range { display: flex; align-items: end; gap: 7px; }
+    .price-field { min-width: 0; display: grid; gap: 5px; color: #81877e; font-size: 10px; }
+    .price-field input { width: 100%; height: 32px; padding: 5px 8px; border: 1px solid #dfe2dc; border-radius: 5px; outline: 0; }
+    .price-field input:focus { border-color: var(--green); }
+    .go-button { height: 32px; padding: 0 6px; color: var(--green); background: transparent; border: 0; font-size: 12px; font-weight: 700; }
+
+    .catalog-top { min-height: 42px; display: flex; align-items: start; justify-content: space-between; gap: 16px; margin: 0 0 11px; }
+    .catalog-title { margin: 0; color: #252a23; font-size: 21px; font-weight: 700; letter-spacing: -.5px; }
+    .result-count { display: block; margin-top: 3px; color: #858a82; font-size: 11px; }
+    .sort-control { display: flex; align-items: center; gap: 7px; color: #697067; font-size: 11px; }
+    .sort-control select { min-width: 136px; height: 35px; padding: 0 9px; color: #343a32; background: white; border: 1px solid #e2e4df; border-radius: 5px; outline: 0; font-size: 11px; }
+    .product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+    .product-card { min-width: 0; padding: 7px; background: #fff; border: 1px solid #e9eae7; border-radius: 8px; transition: box-shadow .18s, transform .18s; }
+    .product-card:hover { transform: translateY(-2px); box-shadow: 0 7px 22px #17200f10; }
+    .product-card[hidden] { display: none; }
+    .product-image { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: #fff; border: 1px solid #f0f0ee; border-radius: 7px; }
+    .product-image > img { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .discount {
+      position: absolute;
+      top: 10px;
+      right: -25px;
+      width: 100px;
+      padding: 5px 0;
+      color: #fff;
+      background: #b60812;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 700;
+      transform: rotate(45deg);
+    }
+    .favorite {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: #6e746d;
+      background: #fff;
+      border: 1px solid #ededeb;
+      border-radius: 50%;
+      font-size: 17px;
+      line-height: 1;
+    }
+    .favorite:hover, .favorite[aria-pressed="true"] { color: var(--red); }
+    .product-details { display: flex; flex-direction: column; padding: 7px 1px 0; }
+    .product-name { display: -webkit-box; min-height: 34px; margin: 0 0 3px; overflow: hidden; color: #292e28; font-size: 12px; font-weight: 500; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .product-prices { display: flex; align-items: baseline; gap: 7px; margin-bottom: 7px; }
+    .price { color: #191d19; font-size: 14px; font-weight: 700; }
+    .old-price { color: #777d75; font-size: 11px; text-decoration: line-through; }
+    .product-unit { min-height: 18px; margin: 0 0 8px; color: #7e847c; font-size: 10px; }
+    .add-button { width: 100%; min-height: 32px; color: var(--red); background: white; border: 1px solid var(--red); border-radius: 7px; font-size: 11px; font-weight: 700; transition: color .16s, background .16s; }
+    .add-button:hover:not(:disabled) { color: white; background: var(--red); }
+    .add-button:disabled { color: #858b83; border-color: #dfe3da; cursor: not-allowed; }
+    .empty-state { grid-column: 1 / -1; padding: 54px 20px; color: #777d75; background: white; border: 1px solid var(--line); border-radius: 7px; text-align: center; }
+
+    .site-footer { padding: 23px 0 16px; color: #51564f; background: #f0f1ee; text-align: center; }
+    .info-section { padding-block: 42px; scroll-margin-top: 16px; }
+    .info-section + .info-section { border-top: 1px solid var(--line); }
+    .info-section h2 { margin: 0 0 10px; color: #273321; font-size: 24px; letter-spacing: -.4px; }
+    .info-section > p { max-width: 720px; margin: 0; color: #62685f; line-height: 1.7; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+    .info-card { padding: 20px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+    .info-card h3 { margin: 0 0 8px; color: #30362e; font-size: 15px; }
+    .info-card p { margin: 0; color: #62685f; line-height: 1.65; }
+    .about-pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 22px 0 30px; }
+    .about-pillar { border-top: 3px solid #8da86d; }
+    .about-pillar h3 { font-size: 17px; }
+    .comparison-wrap { margin-top: 16px; overflow-x: auto; background: white; border: 1px solid var(--line); border-radius: 8px; }
+    .comparison-table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+    .comparison-table th, .comparison-table td { padding: 15px 16px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.6; }
+    .comparison-table thead th { color: white; background: var(--green); font-size: 13px; }
+    .comparison-table tbody th { width: 19%; color: #30362e; background: #f7f8f5; font-size: 13px; }
+    .comparison-table td { color: #555d51; }
+    .comparison-table td:nth-child(2) { color: #315b17; }
+    .comparison-table tr:last-child th, .comparison-table tr:last-child td { border-bottom: 0; }
+    .comparison-note { margin-top: 12px !important; color: #777d75 !important; font-size: 12px; }
+    .contact-button { display: inline-flex; min-height: 40px; align-items: center; margin-top: 18px; padding: 0 16px; color: white; background: var(--green); border-radius: 6px; font-weight: 700; }
+    .contact-button:hover { background: var(--green-dark); }
+    .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 15px; font-size: 11px; }
+    .footer-links a:hover { color: var(--green); text-decoration: underline; }
+    .footer-brand { margin: 0 0 8px; color: #30362e; font-size: 12px; font-weight: 700; }
+    .copyright { margin: 0; color: #888d85; font-size: 10px; }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 3; max-width: calc(100vw - 40px); padding: 12px 16px; color: white; background: #25351e; border-radius: 6px; box-shadow: 0 5px 20px #0002; font-size: 12px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .18s, transform .18s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .whatsapp-link { position: fixed; right: 20px; bottom: 20px; z-index: 2; width: 54px; height: 54px; display: grid; place-items: center; color: white; background: #25d366; border: 0; border-radius: 50%; box-shadow: 0 4px 16px #17200f35; transition: background .18s, transform .18s; }
+    .whatsapp-link:hover { background: #1daf57; transform: translateY(-2px); }
+    .whatsapp-link:focus-visible { outline: 3px solid #166534; outline-offset: 3px; }
+    .whatsapp-link svg { width: 28px; height: 28px; }
+    .account-dialog { width: min(520px, calc(100% - 32px)); max-height: min(88vh, 760px); padding: 0; overflow: auto; color: var(--ink); background: white; border: 0; border-radius: 10px; box-shadow: 0 22px 80px #15200f40; }
+    .account-dialog::backdrop { background: #18201499; backdrop-filter: blur(2px); }
+    .dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 22px 24px 16px; border-bottom: 1px solid var(--line); }
+    .dialog-header h2 { margin: 0; color: #273321; font-size: 20px; }
+    .dialog-header p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .dialog-close { width: 32px; height: 32px; flex: 0 0 auto; color: #676d64; background: white; border: 1px solid var(--line); border-radius: 50%; font-size: 18px; line-height: 1; }
+    .dialog-close:hover { color: var(--red); }
+    .customer-signout { min-height: 32px; padding: 5px 9px; color: #5b6554; background: white; border: 1px solid var(--line); border-radius: 5px; font-size: 10px; }
+    .dialog-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 18px 24px 0; padding: 4px; background: #f3f5f0; border-radius: 7px; }
+    .dialog-tab { min-height: 36px; padding: 7px 5px; color: #62685f; background: transparent; border: 0; border-radius: 5px; font-size: 12px; font-weight: 600; }
+    .dialog-tab[aria-selected="true"] { color: var(--green-dark); background: white; box-shadow: 0 1px 5px #18201415; }
+    .dialog-panel { padding: 19px 24px 24px; }
+    .dialog-panel[hidden] { display: none; }
+    .dialog-form { display: grid; gap: 13px; }
+    .dialog-form[hidden] { display: none; }
+    .form-field { display: grid; gap: 5px; color: #3c4439; font-size: 11px; font-weight: 600; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; min-height: 40px; padding: 9px 11px; color: var(--ink); background: white; border: 1px solid #dfe3da; border-radius: 6px; outline: 0; font-size: 13px; }
+    .form-field textarea { min-height: 74px; resize: vertical; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #71945b; box-shadow: 0 0 0 3px #315b1710; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-submit { min-height: 42px; margin-top: 2px; color: white; background: var(--green); border: 0; border-radius: 6px; font-size: 13px; font-weight: 700; }
+    .form-submit:hover { background: var(--green-dark); }
+    .text-link { padding: 0; color: var(--green); background: transparent; border: 0; font: inherit; text-align: left; text-decoration: underline; cursor: pointer; }
+    .demo-note { margin: 0; padding: 10px 11px; color: #656d5f; background: #f4f6f0; border-radius: 5px; font-size: 11px; line-height: 1.55; }
+    .plan-summary { margin: 0; padding: 10px 11px; color: #40533a; background: #f3f7ed; border-radius: 5px; font-size: 11px; }
+    .form-message { margin: 0; color: var(--red); font-size: 11px; }
+    .form-message.success { color: var(--green); }
+    .cart-lines { display: grid; gap: 9px; max-height: 260px; margin: 0 0 13px; overflow-y: auto; }
+    .cart-line { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 9px; border: 1px solid var(--line); border-radius: 6px; }
+    .cart-line-name { min-width: 0; color: #343c30; font-size: 12px; font-weight: 600; }
+    .cart-line-qty { display: flex; align-items: center; gap: 7px; color: #4c5546; font-size: 12px; }
+    .cart-line-qty button { width: 25px; height: 25px; color: var(--green); background: #f0f4eb; border: 0; border-radius: 4px; font-weight: 700; }
+    .cart-line-price { color: #30382a; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .cart-total { display: flex; justify-content: space-between; margin: 0 0 15px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 14px; font-weight: 700; }
+    .checkout-login { display: grid; gap: 12px; }
+
+    @media (max-width: 1050px) {
+      .wrap { width: calc(100% - 36px); }
+      .catalog-layout { grid-template-columns: 190px minmax(0, 1fr); gap: 15px; }
+      .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .topbar { gap: 18px; }
+      .header-actions { gap: 9px; }
+    }
+    @media (max-width: 650px) {
+      .wrap { width: calc(100% - 24px); }
+      .home-hero, .about-hero { height: 410px; }
+      .hero-copy { left: 54px; width: calc(100% - 108px); }
+      .hero-copy h2 { font-size: 36px; }
+      .hero-control { width: 34px; height: 34px; font-size: 20px; }
+      .hero-control-prev { left: 10px; }
+      .hero-control-next { right: 10px; }
+      .topbar { min-height: auto; flex-wrap: wrap; gap: 10px; padding-block: 7px; }
+      .brand-logo { width: 150px; height: 68px; }
+      .header-actions { margin-left: auto; }
+      .header-actions .account-label { display: none; }
+      .header-search { order: 3; width: 100%; height: 38px; }
+      .nav-links { min-height: 38px; justify-content: center; flex-wrap: wrap; gap: 5px 16px; padding-block: 4px; }
+      .nav-links a { font-size: 11px; }
+      .products-submenu { left: 50%; min-width: 205px; transform: translateX(-50%); }
+      .breadcrumbs { padding: 16px 0 13px; font-size: 11px; }
+      .catalog-layout { grid-template-columns: 1fr; gap: 13px; padding-bottom: 45px; }
+      .filters { border-radius: 6px; }
+      .filters > details > summary { display: flex; align-items: center; justify-content: space-between; padding: 12px; font-weight: 700; cursor: pointer; list-style: none; }
+      .filters > details > summary::-webkit-details-marker { display: none; }
+      .filters > details > summary::after { content: "+"; color: var(--red); font-size: 17px; }
+      .filters > details[open] > summary::after { content: "−"; }
+      .filters-content { border-top: 1px solid var(--line); }
+      .filters-heading { display: none; }
+      .filters .filter-group { display: inline-block; width: 100%; }
+      .filter-group.categories .filter-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .catalog-top { align-items: center; gap: 8px; margin-bottom: 9px; }
+      .catalog-title { font-size: 19px; }
+      .result-count { font-size: 10px; }
+      .sort-control { gap: 4px; font-size: 0; }
+      .sort-control select { min-width: 117px; height: 33px; font-size: 10px; }
+      .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .product-card { padding: 5px; }
+      .product-name { min-height: 32px; font-size: 11px; }
+      .product-prices { gap: 5px; }
+      .price { font-size: 13px; }
+      .product-unit { font-size: 9px; }
+      .add-button { min-height: 30px; }
+      .footer-links { gap: 12px; }
+      .info-section { padding-block: 30px; }
+      .info-section h2 { font-size: 21px; }
+      .info-grid { grid-template-columns: 1fr; gap: 10px; }
+      .about-pillars { grid-template-columns: 1fr; }
+      .comparison-table th, .comparison-table td { padding: 12px; }
+      .dialog-header { padding: 18px 18px 14px; }
+      .dialog-tabs { margin: 15px 18px 0; }
+      .dialog-panel { padding: 16px 18px 20px; }
+      .dialog-tab { font-size: 11px; }
+      .form-grid { grid-template-columns: 1fr; gap: 13px; }
+      .whatsapp-link { right: 14px; bottom: 14px; width: 50px; height: 50px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap topbar">
+      <a class="brand" href="/" aria-label="Fresh Vegbox home"><img class="brand-logo" src="assets/fresh-vegbox-logo.png" alt="Fresh Vegbox"></a>
+      <label class="header-search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <input id="search" type="search" placeholder="Search for a vegetable" aria-label="Search for a vegetable">
+      </label>
+      <div class="header-actions">
+        <button class="icon-button" id="accountButton" type="button" aria-label="Account">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 20v-1.6a6.5 6.5 0 0 1 13 0V20h-13Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <span class="account-label">Account</span>
+        </button>
+        <button class="icon-button" id="cartButton" type="button" aria-label="Shopping bag, 0 items">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8h14l1 12H4L5 8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 9V6a3 3 0 0 1 6 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span>Bag</span><span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+    <nav class="category-nav" aria-label="Main navigation">
+      <div class="wrap nav-links page-nav">
+        <a href="/" data-page-link="home">Home</a>
+        <a href="/about" data-page-link="about">About</a>
+        <div class="nav-dropdown">
+          <a href="/products" data-page-link="products">Products</a>
+          <div class="products-submenu" id="productsSubmenu" aria-label="Product categories">
+            <a href="/products">All products</a>
+            <a href="/products?category=Leafy%20Vegetables" data-category-link="Leafy Vegetables">Leafy vegetables</a>
+            <a href="/products?category=Regular%20Vegetables" data-category-link="Regular Vegetables">Regular vegetables</a>
+            <a href="/products?category=Root%20Vegetables" data-category-link="Root Vegetables">Root vegetables</a>
+            <a href="/products?category=Herbs%20%26%20Spices" data-category-link="Herbs &amp; Spices">Herbs &amp; spices</a>
+            <a href="/products?category=Salad" data-category-link="Salad">Salad</a>
+            <a href="/products?category=Exotic%20Vegetables" data-category-link="Exotic Vegetables">Exotic vegetables</a>
+            <a href="/products?category=Vegetables%20Cut" data-category-link="Vegetables Cut">Cut vegetables</a>
+          </div>
+        </div>
+        <a href="/blog" data-page-link="blog">Blog</a>
+        <a href="/contact" data-page-link="contact">Contact Us</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="home-hero home-section" aria-label="Fresh Vegbox highlights" aria-roledescription="carousel">
+    <div class="hero-slides" aria-live="off">
+      <article class="hero-slide" aria-hidden="false" aria-roledescription="slide" aria-label="1 of 3">
+        <img src="assets/hero-salad.jpg" alt="" width="1800" height="2722" fetchpriority="high">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">Good food, grown with care</p><h2>Fresh from farm to your table</h2><p>Discover naturally grown vegetables and seasonal picks for your everyday meals.</p><a class="hero-cta" href="/products">Shop fresh produce</a></div>
+      </article>
+      <article class="hero-slide" aria-hidden="true" aria-roledescription="slide" aria-label="2 of 3" hidden>
+        <img src="assets/hero-market.jpg" alt="" width="1800" height="1350">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">Freshness you can see</p><h2>A colorful basket starts here</h2><p>Shop leafy greens, crisp vegetables, and fresh favorites in one place.</p><a class="hero-cta" href="/products">Shop fresh produce</a></div>
+      </article>
+      <article class="hero-slide" aria-hidden="true" aria-roledescription="slide" aria-label="3 of 3" hidden>
+        <img src="assets/hero-produce.jpg" alt="" width="1800" height="1200">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">Picked for your kitchen</p><h2>Make every meal feel fresh</h2><p>Find the produce you need and order your next Fresh Vegbox today.</p><a class="hero-cta" href="/products">Shop fresh produce</a></div>
+      </article>
+    </div>
+    <button class="hero-control hero-control-prev" type="button" aria-label="Show previous slide">‹</button>
+    <button class="hero-control hero-control-next" type="button" aria-label="Show next slide">›</button>
+    <div class="hero-dots" role="group" aria-label="Choose a slide">
+      <button class="hero-dot" type="button" aria-label="Show slide 1" aria-pressed="true"></button>
+      <button class="hero-dot" type="button" aria-label="Show slide 2" aria-pressed="false"></button>
+      <button class="hero-dot" type="button" aria-label="Show slide 3" aria-pressed="false"></button>
+      <button class="hero-autoplay-toggle" type="button" aria-label="Pause automatic slide rotation" aria-pressed="false">Ⅱ</button>
+    </div>
+  </section>
+
+  <section class="about-hero about-section image-hero" aria-label="Fresh Vegbox farm story" aria-roledescription="carousel">
+    <div class="hero-slides" aria-live="off">
+      <article class="hero-slide" aria-hidden="false" aria-roledescription="slide" aria-label="1 of 3">
+        <img src="assets/about-harvest.jpg" alt="" width="1800" height="1200" fetchpriority="high">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">From growers we know</p><h2>Rooted in better farming</h2><p>We connect regional growers with urban households through thoughtful sourcing and fresh produce.</p></div>
+      </article>
+      <article class="hero-slide" aria-hidden="true" aria-roledescription="slide" aria-label="2 of 3" hidden>
+        <img src="assets/about-farm.jpg" alt="" width="1800" height="1013">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">Respect for every harvest</p><h2>A fairer path from farm to home</h2><p>Our aim is transparent sourcing that supports sustainable income for regional farmers.</p></div>
+      </article>
+      <article class="hero-slide" aria-hidden="true" aria-roledescription="slide" aria-label="3 of 3" hidden>
+        <img src="assets/about-fields.jpg" alt="" width="1800" height="1200">
+        <div class="hero-shade"></div>
+        <div class="hero-copy"><p class="hero-eyebrow">Freshness with purpose</p><h2>Growing a thoughtful food future</h2><p>We’re working toward a produce ecosystem that values freshness, care, and responsible choices.</p></div>
+      </article>
+    </div>
+    <button class="hero-control hero-control-prev" type="button" aria-label="Show previous slide">‹</button>
+    <button class="hero-control hero-control-next" type="button" aria-label="Show next slide">›</button>
+    <div class="hero-dots" role="group" aria-label="Choose a slide">
+      <button class="hero-dot" type="button" aria-label="Show slide 1" aria-pressed="true"></button>
+      <button class="hero-dot" type="button" aria-label="Show slide 2" aria-pressed="false"></button>
+      <button class="hero-dot" type="button" aria-label="Show slide 3" aria-pressed="false"></button>
+      <button class="hero-autoplay-toggle" type="button" aria-label="Pause automatic slide rotation" aria-pressed="false">Ⅱ</button>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section class="home-intro home-section" aria-labelledby="homeIntroTitle">
+      <h1 id="homeIntroTitle">Fresh food, from local farms to your home</h1>
+      <p><strong>Fresh Vegbox</strong> is an end-to-end agri-tech and direct-to-consumer (D2C) platform designed to revolutionize the urban fresh produce ecosystem. We operate at the intersection of agriculture, logistics, and digital commerce to bridge the divide between local sustainable farmers and health-conscious urban households.<br><br>By delivering 100% naturally grown, vegetables and seasonal fruits directly to customer doorsteps <strong>within 24 hours of harvest</strong>, Fresh Vegbox fundamentally alters how fresh food is sourced, preserved, and consumed in modern cities.</p>
+    </section>
+    <section class="info-section about-section" id="about" aria-labelledby="aboutTitle">
+      <h2 id="aboutTitle">About Fresh Vegbox</h2>
+      <p>Fresh Vegbox makes it easy to browse vegetables, choose what you need, and place an order from one simple local shop. Explore the catalog, add items to your bag, and contact us if you need help with your order.</p>
+      <div class="info-grid about-pillars">
+        <article class="info-card about-pillar">
+          <h3>🎯 Our Mission</h3>
+          <p>To make farm-fresh, chemical-free produce easily accessible to urban consumers while guaranteeing fair trade pricing, transparent sourcing, and sustainable income for regional farmers.</p>
+        </article>
+        <article class="info-card about-pillar">
+          <h3>🚀 Our Vision</h3>
+          <p>To become the region's most trusted, eco-conscious fresh produce delivery brand—recognized for zero-waste packaging, minimal chemical preservation, and uncompromised food purity.</p>
+        </article>
+      </div>
+      <h3 id="freshVegboxComparisonTitle">Key Differentiators &amp; Strengths</h3>
+      <div class="comparison-wrap" role="region" aria-labelledby="freshVegboxComparisonTitle" tabindex="0">
+        <table class="comparison-table">
+          <thead>
+            <tr><th scope="col">Feature</th><th scope="col">The Fresh Vegbox Advantage</th><th scope="col">Traditional Supply Chain</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Farm-to-Door Time</th><td>⏱️ Delivered within <strong>24 hours</strong> of picking</td><td>⏳ 3 to 5 days across multiple wholesale mandis</td></tr>
+            <tr><th scope="row">Preservation Method</th><td>❄️ <strong>Cold-chain management &amp; micro-bubble washing</strong></td><td>🧪 Post-harvest chemical sprays, wax coatings, and artificial ripeners</td></tr>
+            <tr><th scope="row">Sourcing Integrity</th><td>🧑‍🌾 <strong>Direct farm-gate sourcing</strong> from verified growers</td><td>🏬 Multi-layered intermediaries with high markup fees</td></tr>
+            <tr><th scope="row">Packaging</th><td>♻️ <strong>100% biodegradable and reusable</strong> containers</td><td>🛍️ Heavy usage of single-use plastics</td></tr>
+            <tr><th scope="row">Flexibility</th><td>📦 <strong>Customizable weekly/monthly subscriptions</strong></td><td>🛒 Manual, inconsistent market purchasing</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="comparison-note">Fresh Vegbox practices and delivery availability may vary by product and service area. Contact us for current sourcing, handling, packaging, and delivery details.</p>
+    </section>
+    <nav class="breadcrumbs products-section" aria-label="Breadcrumb"><a href="/">Home</a><span class="crumb-separator">&gt;</span><span aria-current="page">Vegetables 🍅</span></nav>
+    <div class="catalog-layout products-section">
+      <aside class="filters" aria-label="Product filters">
+        <details open>
+          <summary>Filters</summary>
+          <div class="filters-content">
+            <div class="filters-heading"><strong>Filters</strong><button class="clear-button" id="clearFilters" type="button">Clear all</button></div>
+            <section class="filter-group categories">
+              <h2 class="filter-title">Category</h2>
+              <div class="filter-options">
+                <label class="filter-option"><input type="checkbox" name="category" value="all" checked><span>All products</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Leafy Vegetables"><span>Leafy vegetables 🌿</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Regular Vegetables"><span>Regular vegetables</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Root Vegetables"><span>Root vegetables 🥔</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Herbs & Spices"><span>Herbs &amp; spices 🌶️</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Salad"><span>Salad 🥬</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Exotic Vegetables"><span>Exotic vegetables 🥑</span></label>
+                <label class="filter-option"><input type="checkbox" name="category" value="Vegetables Cut"><span>Vegetables cut</span></label>
+              </div>
+            </section>
+            <section class="filter-group">
+              <h2 class="filter-title">Price range</h2>
+              <div class="price-range">
+                <label class="price-field"><span>Min (₹)</span><input id="minPrice" type="number" min="0" placeholder="0" aria-label="Minimum price"></label>
+                <label class="price-field"><span>Max (₹)</span><input id="maxPrice" type="number" min="0" placeholder="400" aria-label="Maximum price"></label>
+                <button class="go-button" id="applyPrice" type="button">Go</button>
+              </div>
+            </section>
+            <section class="filter-group">
+              <h2 class="filter-title">Weight</h2>
+              <div class="filter-options">
+                <label class="filter-option"><input type="checkbox" name="weight" value="500gm"><span>500 gm</span></label>
+                <label class="filter-option"><input type="checkbox" name="weight" value="250gm"><span>250 gm</span></label>
+                <label class="filter-option"><input type="checkbox" name="weight" value="1bunch"><span>1 bunch</span></label>
+                <label class="filter-option"><input type="checkbox" name="weight" value="1kg"><span>1 kg</span></label>
+                <label class="filter-option"><input type="checkbox" name="weight" value="200gm"><span>200 gm</span></label>
+              </div>
+            </section>
+          </div>
+        </details>
+      </aside>
+
+      <section class="catalog" aria-labelledby="catalogTitle">
+        <div class="catalog-top">
+          <div><h1 class="catalog-title" id="catalogTitle">Vegetables 🍅</h1><span class="result-count" id="resultCount" aria-live="polite"></span></div>
+          <label class="sort-control">Sort by
+            <select id="sortProducts" aria-label="Sort products">
+              <option value="newest">Newest first</option>
+              <option value="price-low">Price: low to high</option>
+              <option value="price-high">Price: high to low</option>
+              <option value="name">Name: A to Z</option>
+            </select>
+          </label>
+        </div>
+        <div class="product-grid" id="products">
+          <article class="product-card" data-name="Singhada / Water chestnut" data-category="Exotic Vegetables" data-price="60" data-weight="500gm" data-order="1">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0485_0-1762595998671.jpg?width=600&amp;format=webp" alt="Singhada / Water chestnut" loading="lazy"><button class="favorite" type="button" aria-label="Add Singhada to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Singhada / Water chestnut</h2><div class="product-prices"><span class="price">₹60</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="New Potato / Naya Aloo" data-category="Root Vegetables" data-price="40" data-weight="500gm" data-order="2">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0484_0-1762593086242.jpg?width=600&amp;format=webp" alt="New Potato / Naya Aloo" loading="lazy"><span class="discount">20% off</span><button class="favorite" type="button" aria-label="Add new potatoes to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">New Potato / Naya Aloo</h2><div class="product-prices"><span class="price">₹40</span><span class="old-price">₹50</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Haldi Patta (Turmeric Leaves)" data-category="Leafy Vegetables" data-price="20" data-weight="1bunch" data-order="3">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0455_0-1751904515313.jpg?width=600&amp;format=webp" alt="Haldi Patta (Turmeric Leaves)" loading="lazy"><span class="discount">50% off</span><button class="favorite" type="button" aria-label="Add turmeric leaves to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Haldi Patta (Turmeric Leaves) 🌿</h2><div class="product-prices"><span class="price">₹20</span><span class="old-price">₹40</span></div><p class="product-unit">1 bunch</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Kantuli" data-category="Regular Vegetables" data-price="88" data-weight="250gm" data-order="4">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0441_0-1750156469687.jpg?width=600&amp;format=webp" alt="Fresh kantuli" loading="lazy"><span class="discount">41% off</span><button class="favorite" type="button" aria-label="Add kantuli to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Kantuli</h2><div class="product-prices"><span class="price">₹88</span><span class="old-price">₹148</span></div><p class="product-unit">250 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="White Karela - Safed Karela" data-category="Regular Vegetables" data-price="59" data-weight="500gm" data-order="5">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0422_0-1745067736253.jpg?width=600&amp;format=webp" alt="White Karela - Safed Karela" loading="lazy"><span class="discount">9% off</span><button class="favorite" type="button" aria-label="Add white karela to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">White Karela - Safed Karela</h2><div class="product-prices"><span class="price">₹59</span><span class="old-price">₹65</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Cherry Tomato - Small Tomato" data-category="Salad" data-price="55" data-weight="250gm" data-order="6">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0421_0-1744970425482.jpg?width=600&amp;format=webp" alt="Cherry Tomato - Small Tomato" loading="lazy"><span class="discount">21% off</span><button class="favorite" type="button" aria-label="Add cherry tomatoes to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Cherry Tomato - Small Tomato</h2><div class="product-prices"><span class="price">₹55</span><span class="old-price">₹70</span></div><p class="product-unit">Small box</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Green Round Brinjal" data-category="Regular Vegetables" data-price="45" data-weight="500gm" data-order="7">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0419_0-1744820642225.jpg?width=600&amp;format=webp" alt="Green Round Brinjal" loading="lazy"><span class="discount">25% off</span><button class="favorite" type="button" aria-label="Add green brinjal to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Green Round Brinjal</h2><div class="product-prices"><span class="price">₹45</span><span class="old-price">₹60</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Celery Leaves (Celery Patta)" data-category="Leafy Vegetables" data-price="59" data-weight="1bunch" data-order="8">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0418_0-1744820253592.jpg?width=600&amp;format=webp" alt="Celery Leaves (Celery Patta)" loading="lazy"><span class="discount">26% off</span><button class="favorite" type="button" aria-label="Add celery leaves to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Celery Leaves (Celery Patta) 🌿</h2><div class="product-prices"><span class="price">₹59</span><span class="old-price">₹80</span></div><p class="product-unit">1 bunch</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Rajma Sheng - Kidney Beans" data-category="Regular Vegetables" data-price="58" data-weight="500gm" data-order="9">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0386_0-1744717604942.jpg?width=600&amp;format=webp" alt="Rajma Sheng - Kidney Beans" loading="lazy"><span class="discount">11% off</span><button class="favorite" type="button" aria-label="Add kidney beans to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Rajma Sheng - Kidney Beans</h2><div class="product-prices"><span class="price">₹58</span><span class="old-price">₹65</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Big Raddish - Motha Mula" data-category="Root Vegetables" data-price="49" data-weight="500gm" data-order="10">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0380_0-1743323098940.jpg?width=600&amp;format=webp" alt="Big Raddish - Motha Mula" loading="lazy"><span class="discount">11% off</span><button class="favorite" type="button" aria-label="Add big radish to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Big Raddish - Motha Mula</h2><div class="product-prices"><span class="price">₹49</span><span class="old-price">₹55</span></div><p class="product-unit">2 pieces · approx. 500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Pumpkin Leaves / Bhoplyacha Pala" data-category="Leafy Vegetables" data-price="39" data-weight="1bunch" data-order="11">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0378_0-1743180311278.jpg?width=600&amp;format=webp" alt="Pumpkin Leaves / Bhoplyacha Pala" loading="lazy"><span class="discount">22% off</span><button class="favorite" type="button" aria-label="Add pumpkin leaves to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Pumpkin Leaves / Bhoplyacha Pala</h2><div class="product-prices"><span class="price">₹39</span><span class="old-price">₹50</span></div><p class="product-unit">1 bunch</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Moringa Leaves - Shevga Patta" data-category="Leafy Vegetables" data-price="55" data-weight="250gm" data-order="12">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0377_0-1743179211657.jpg?width=600&amp;format=webp" alt="Moringa Leaves - Shevga Patta" loading="lazy"><span class="discount">21% off</span><button class="favorite" type="button" aria-label="Add moringa leaves to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Moringa Leaves - Shevga Patta</h2><div class="product-prices"><span class="price">₹55</span><span class="old-price">₹70</span></div><p class="product-unit">Approx. 250 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Garlic Dry Medium Size" data-category="Root Vegetables" data-price="42" data-weight="250gm" data-order="13">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0368_0-1742628652258.jpg?width=600&amp;format=webp" alt="Garlic Dry Medium Size" loading="lazy"><span class="discount">57% off</span><button class="favorite" type="button" aria-label="Add garlic to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Garlic Dry Medium Size</h2><div class="product-prices"><span class="price">₹42</span><span class="old-price">₹98</span></div><p class="product-unit">250 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Karela - Bitter Gourd" data-category="Regular Vegetables" data-price="38" data-weight="500gm" data-order="14">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0364_0-1742319031253.jpg?width=600&amp;format=webp" alt="Karela - Bitter Gourd" loading="lazy"><span class="discount">5% off</span><button class="favorite" type="button" aria-label="Add karela to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Karela - Bitter Gourd</h2><div class="product-prices"><span class="price">₹38</span><span class="old-price">₹40</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Alibaug Onion - Alibaug Kanda" data-category="Root Vegetables" data-price="320" data-weight="1kg" data-order="15">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0340_0-1742055001999.jpg?width=600&amp;format=webp" alt="Alibaug Onion - Alibaug Kanda" loading="lazy"><span class="discount">20% off</span><button class="favorite" type="button" aria-label="Add Alibaug onions to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Alibaug Onion - Alibaug Kanda</h2><div class="product-prices"><span class="price">₹320</span><span class="old-price">₹400</span></div><p class="product-unit">1 judi · 2 lines</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Chauli Patta - Amaranth Leaves" data-category="Leafy Vegetables" data-price="48" data-weight="1bunch" data-order="16">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0333_0-1741884987431.jpg?width=600&amp;format=webp" alt="Chauli Patta - Amaranth Leaves" loading="lazy"><span class="discount">4% off</span><button class="favorite" type="button" aria-label="Add amaranth leaves to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Chauli Patta - Amaranth Leaves</h2><div class="product-prices"><span class="price">₹48</span><span class="old-price">₹50</span></div><p class="product-unit">1 bunch</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Ghewda - Indian Beans" data-category="Regular Vegetables" data-price="45" data-weight="500gm" data-order="17">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0330_0-1741884668203.jpg?width=600&amp;format=webp" alt="Ghewda - Indian Beans" loading="lazy"><span class="discount">11% off</span><button class="favorite" type="button" aria-label="Add Indian beans to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Ghewda - Indian Beans</h2><div class="product-prices"><span class="price">₹45</span><span class="old-price">₹50</span></div><p class="product-unit">500 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Ambe Halad / White Turmeric" data-category="Herbs & Spices" data-price="51" data-weight="250gm" data-order="18">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0266_0-1741345196173.jpg?width=600&amp;format=webp" alt="Ambe Halad / White Turmeric" loading="lazy"><span class="discount">15% off</span><button class="favorite" type="button" aria-label="Add white turmeric to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Ambe Halad / White Turmeric</h2><div class="product-prices"><span class="price">₹51</span><span class="old-price">₹60</span></div><p class="product-unit">250 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Green Raddish Pods - Mogri Beans" data-category="Regular Vegetables" data-price="50" data-weight="250gm" data-order="19">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0262_0-1741016930326.jpg?width=600&amp;format=webp" alt="Green Raddish Pods - Mogri Beans" loading="lazy"><span class="discount">17% off</span><button class="favorite" type="button" aria-label="Add mogri beans to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Green Raddish Pods - Mogri Beans</h2><div class="product-prices"><span class="price">₹50</span><span class="old-price">₹60</span></div><p class="product-unit">250 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+          <article class="product-card" data-name="Thai Ginger" data-category="Herbs & Spices" data-price="45" data-weight="200gm" data-order="20">
+            <div class="product-image"><img src="https://cdn2.clevup.in/68944/SKU-0258_0-1742045834174.jpg?width=600&amp;format=webp" alt="Thai Ginger" loading="lazy"><span class="discount">18% off</span><button class="favorite" type="button" aria-label="Add Thai ginger to favourites" aria-pressed="false">♡</button></div>
+            <div class="product-details"><h2 class="product-name">Thai Ginger</h2><div class="product-prices"><span class="price">₹45</span><span class="old-price">₹55</span></div><p class="product-unit">200 gm</p><button class="add-button" type="button">+ Add</button></div>
+          </article>
+        </div>
+      </section>
+    </div>
+    <section class="info-section blog-section" id="blog" aria-labelledby="blogTitle">
+      <h2 id="blogTitle">From the Fresh Vegbox blog</h2>
+      <p>Simple ideas to help you choose, store, and enjoy your vegetables.</p>
+      <div class="info-grid">
+        <article class="info-card">
+          <h3>Keep leafy vegetables fresh</h3>
+          <p>Remove damaged leaves, keep greens dry, and store them in the refrigerator in a breathable bag or container.</p>
+        </article>
+        <article class="info-card">
+          <h3>Plan a colorful vegetable basket</h3>
+          <p>Pick a mix of leafy greens, roots, and seasonal vegetables to add variety to meals through the week.</p>
+        </article>
+        <article class="info-card">
+          <h3>Reduce kitchen waste</h3>
+          <p>Plan portions before shopping and use delicate vegetables first. Store each item according to its needs.</p>
+        </article>
+      </div>
+    </section>
+    <section class="info-section contact-section" id="contact" aria-labelledby="contactTitle">
+      <h2 id="contactTitle">Contact Us</h2>
+      <p>Questions about products, orders, or a veg box subscription? Message the Fresh Vegbox team on WhatsApp.</p>
+      <a class="contact-button" href="https://wa.me/918866361797?text=Hello%20Fresh%20Vegbox%2C%20I%20have%20a%20question." target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="footer-brand">Fresh Vegbox — freshness than anything 🌿</p>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="/">Home</a><a href="/about">About</a><a href="/products">Products</a><a href="/blog">Blog</a><a href="/contact">Contact Us</a><a href="#subscribe" class="subscription-link">Veg box subscription</a>
+      </nav>
+      <p class="copyright">Copyright © 2026 Fresh Vegbox. All rights reserved.</p>
+    </div>
+  </footer>
+  <dialog class="account-dialog" id="accountDialog" aria-labelledby="dialogTitle">
+    <div class="dialog-header">
+      <div><h2 id="dialogTitle">Welcome to Fresh Vegbox</h2><p>Sign in, create an account, or plan your regular veg box.</p></div>
+      <button class="customer-signout" id="customerSignout" type="button" hidden>Sign out</button>
+      <button class="dialog-close" id="closeAccountDialog" type="button" aria-label="Close dialog">×</button>
+    </div>
+    <div class="dialog-tabs" role="tablist" aria-label="Account options">
+      <button class="dialog-tab" id="loginTab" type="button" role="tab" aria-selected="true" aria-controls="loginPanel">Sign in</button>
+      <button class="dialog-tab" id="signupTab" type="button" role="tab" aria-selected="false" aria-controls="signupPanel" tabindex="-1">Create account</button>
+      <button class="dialog-tab" id="subscribeTab" type="button" role="tab" aria-selected="false" aria-controls="subscribePanel" tabindex="-1">Subscribe</button>
+    </div>
+    <section class="dialog-panel" id="loginPanel" role="tabpanel" aria-labelledby="loginTab">
+      <form class="dialog-form" id="loginForm">
+        <label class="form-field">Email address<input name="email" type="email" autocomplete="email" required></label>
+        <label class="form-field">Password<input name="password" type="password" autocomplete="current-password" minlength="12" required></label>
+        <button class="form-submit" type="submit">Sign in</button>
+        <p class="form-message" id="loginMessage" role="status" aria-live="polite"></p>
+        <p class="demo-note">Customer sign-in runs on this local server. Passwords are hashed before they are stored.</p>
+        <button class="text-link" id="showForgotPassword" type="button">Forgot password?</button>
+        <p class="auth-switch">New to Fresh Vegbox? <a href="/signup">Create an account</a></p>
+      </form>
+      <form class="dialog-form" id="forgotPasswordForm" hidden>
+        <p class="demo-note">We’ll send the same 6-digit OTP to your registered email and WhatsApp. It expires in 3 minutes.</p>
+        <label class="form-field">Email address<input name="email" type="email" autocomplete="email" required></label>
+        <button class="form-submit" type="submit">Send OTP</button>
+        <p class="form-message" id="forgotPasswordMessage" role="status" aria-live="polite"></p>
+        <button class="text-link" id="backToLogin" type="button">Back to sign in</button>
+      </form>
+      <form class="dialog-form" id="resetPasswordForm" hidden>
+        <p class="demo-note">Enter the OTP sent to your registered email and WhatsApp. It expires 3 minutes after it was sent.</p>
+        <label class="form-field">Account email<input name="email" type="email" autocomplete="email" readonly required></label>
+        <label class="form-field">6-digit OTP<input name="otp" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
+        <label class="form-field">New password<input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="256" required></label>
+        <label class="form-field">Confirm new password<input name="confirm_password" type="password" autocomplete="new-password" minlength="12" maxlength="256" required></label>
+        <button class="form-submit" type="submit">Update password</button>
+        <p class="form-message" id="resetPasswordMessage" role="status" aria-live="polite"></p>
+        <button class="text-link" id="requestAnotherOtp" type="button">Request another OTP</button>
+      </form>
+    </section>
+    <section class="dialog-panel" id="signupPanel" role="tabpanel" aria-labelledby="signupTab" hidden>
+      <form class="dialog-form" id="signupForm">
+        <label class="form-field">Full name<input name="name" type="text" autocomplete="name" required></label>
+        <div class="form-grid">
+          <label class="form-field">Email address<input name="email" type="email" autocomplete="email" required></label>
+          <label class="form-field">Phone number<input name="phone" type="tel" autocomplete="tel" required></label>
+        </div>
+        <label class="form-field">Create password<input name="password" type="password" autocomplete="new-password" minlength="12" required></label>
+        <button class="form-submit" type="submit">Create account</button>
+        <p class="form-message" id="signupMessage" role="status" aria-live="polite"></p>
+        <p class="demo-note">Use a password of at least 12 characters. Passwords are hashed before being stored.</p>
+        <p class="auth-switch">Already registered? <a href="/signin">Sign in</a></p>
+      </form>
+    </section>
+    <section class="dialog-panel" id="subscribePanel" role="tabpanel" aria-labelledby="subscribeTab" hidden>
+      <form class="dialog-form" id="subscriptionForm">
+        <div class="form-grid">
+          <label class="form-field">Your name<input name="name" type="text" autocomplete="name" required></label>
+          <label class="form-field">Phone number<input name="phone" type="tel" autocomplete="tel" required></label>
+        </div>
+        <label class="form-field">Email address<input name="email" type="email" autocomplete="email" required></label>
+        <label class="form-field">Choose a subscription plan
+          <select name="plan_id" id="subscriptionPlanSelect" required>
+            <option value="">Loading available plans…</option>
+          </select>
+        </label>
+        <p class="demo-note" id="subscriptionPlanDetails">Free delivery up to 3 km.</p>
+        <label class="form-field">Delivery address<textarea name="address" autocomplete="street-address" required></textarea></label>
+        <button class="form-submit" type="submit">Start subscription request</button>
+        <p class="form-message" id="subscriptionMessage" role="status" aria-live="polite"></p>
+        <p class="demo-note">Your subscription request is saved for the shop admin to review. This local version does not collect payments or schedule deliveries.</p>
+      </form>
+    </section>
+  </dialog>
+  <dialog class="account-dialog" id="cartDialog" aria-labelledby="cartDialogTitle">
+    <div class="dialog-header">
+      <div><h2 id="cartDialogTitle">Your vegbox</h2><p>Review your basket and delivery details.</p></div>
+      <button class="dialog-close" id="closeCartDialog" type="button" aria-label="Close basket">×</button>
+    </div>
+    <section class="dialog-panel">
+      <div class="cart-lines" id="cartLines"></div>
+      <p class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></p>
+      <div class="checkout-login" id="checkoutLogin" hidden>
+        <p class="demo-note">Sign in or create a customer account to place an order.</p>
+        <button class="form-submit" id="checkoutSignIn" type="button">Sign in to continue</button>
+      </div>
+      <form class="dialog-form" id="checkoutForm" hidden>
+        <label class="form-field">Phone number<input name="phone" type="tel" autocomplete="tel" required></label>
+        <label class="form-field">Delivery address<textarea name="address" autocomplete="street-address" required></textarea></label>
+        <button class="form-submit" type="submit">Place order · pay details confirmed by shop</button>
+        <p class="demo-note">Your order and stock changes are saved locally. No online payment is collected.</p>
+        <p class="form-message" id="checkoutMessage" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </dialog>
+  <a class="whatsapp-link" href="https://wa.me/918866361797?text=Hello%20Fresh%20Vegbox%2C%20I%27d%20like%20to%20know%20more%20about%20your%20vegetables%20and%20subscription%20boxes." target="_blank" rel="noopener noreferrer" aria-label="Chat with Fresh Vegbox on WhatsApp (opens in a new tab)">
+    <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.04 3C8.87 3 3.04 8.76 3.04 15.85c0 2.26.6 4.47 1.74 6.4L3 29l6.97-1.81a13.2 13.2 0 0 0 6.07 1.47h.01c7.16 0 12.99-5.77 13-12.86A12.68 12.68 0 0 0 25.22 6.7 13 13 0 0 0 16.04 3Zm.01 23.48h-.01c-1.82 0-3.61-.48-5.17-1.4l-.37-.21-4.14 1.08 1.1-4-.24-.4a10.54 10.54 0 0 1-1.62-5.7c0-5.8 4.7-10.51 10.46-10.51 2.79 0 5.41 1.08 7.38 3.04a10.36 10.36 0 0 1 3.06 7.37c0 5.8-4.7 10.52-10.45 10.52Zm5.74-7.87c-.31-.15-1.83-.9-2.11-1-.28-.1-.49-.15-.69.15-.2.31-.8 1.01-.98 1.22-.18.2-.36.23-.67.08-.31-.15-1.3-.47-2.48-1.5-.92-.81-1.54-1.8-1.72-2.1-.18-.31-.02-.48.13-.63.14-.13.31-.35.46-.53.15-.18.2-.3.3-.51.1-.2.05-.38-.03-.53-.07-.15-.69-1.66-.94-2.27-.24-.59-.5-.51-.69-.52h-.58c-.2 0-.53.08-.81.38-.28.31-1.07 1.04-1.07 2.55 0 1.5 1.1 2.96 1.25 3.17.15.2 2.16 3.27 5.23 4.58.73.31 1.3.5 1.74.64.73.23 1.39.2 1.91.12.58-.08 1.83-.74 2.09-1.45.26-.72.26-1.33.18-1.46-.08-.13-.28-.2-.59-.36Z"/></svg>
+  </a>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const grid = document.querySelector("#products");
+    const searchInput = document.querySelector("#search");
+    const countLabel = document.querySelector("#resultCount");
+    const toast = document.querySelector("#toast");
+    document.title = ({
+      home: "Fresh Vegbox", about: "About — Fresh Vegbox",
+      products: "Products — Fresh Vegbox", blog: "Blog — Fresh Vegbox",
+      contact: "Contact Us — Fresh Vegbox"
+    })[document.documentElement.dataset.page] || "Fresh Vegbox";
+    const cartButton = document.querySelector("#cartButton");
+    const cartCount = document.querySelector("#cartCount");
+    const accountDialog = document.querySelector("#accountDialog");
+    const dialogTabs = [...document.querySelectorAll(".dialog-tab")];
+    const pageNavLinks = [...document.querySelectorAll(".page-nav [data-page-link]")];
+    const categoryMenuLinks = [...document.querySelectorAll("[data-category-link]")];
+    const reducedMotionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const categoryInputs = [...document.querySelectorAll('input[name="category"]')];
+    const weightInputs = [...document.querySelectorAll('input[name="weight"]')];
+    let cards = [];
+    grid.replaceChildren();
+    grid.setAttribute("aria-busy", "true");
+    const cart = new Map();
+    const cartDialog = document.querySelector("#cartDialog");
+    const cartLines = document.querySelector("#cartLines");
+    const checkoutForm = document.querySelector("#checkoutForm");
+    const checkoutLogin = document.querySelector("#checkoutLogin");
+    const accountButton = document.querySelector("#accountButton");
+    const customerSignout = document.querySelector("#customerSignout");
+    const loginForm = document.querySelector("#loginForm");
+    const forgotPasswordForm = document.querySelector("#forgotPasswordForm");
+    const resetPasswordForm = document.querySelector("#resetPasswordForm");
+    let csrfToken = "";
+    let customer = null;
+    let toastTimer;
+
+    function updatePageNavigation() {
+      const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+      const currentCategory = new URLSearchParams(window.location.search).get("category");
+      for (const link of pageNavLinks) {
+        const isCurrent = link.pathname.replace(/\/+$/, "") === currentPath;
+        if (isCurrent) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      }
+      for (const link of categoryMenuLinks) {
+        if (link.dataset.categoryLink === currentCategory) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      }
+    }
+
+    updatePageNavigation();
+
+    document.querySelectorAll(".image-hero").forEach((hero) => {
+      const heroSlides = [...hero.querySelectorAll(".hero-slide")];
+      const heroDots = [...hero.querySelectorAll(".hero-dot")];
+      const heroAutoplayToggle = hero.querySelector(".hero-autoplay-toggle");
+      let activeHeroSlide = 0;
+      let heroTimer;
+      let heroPausedByUser = false;
+
+      function showHeroSlide(index) {
+        activeHeroSlide = (index + heroSlides.length) % heroSlides.length;
+        heroSlides.forEach((slide, slideIndex) => {
+          const isActive = slideIndex === activeHeroSlide;
+          slide.hidden = !isActive;
+          slide.setAttribute("aria-hidden", String(!isActive));
+          heroDots[slideIndex].setAttribute("aria-pressed", String(isActive));
+        });
+      }
+
+      function stopHeroAutoplay() {
+        window.clearInterval(heroTimer);
+      }
+
+      function startHeroAutoplay() {
+        stopHeroAutoplay();
+        heroAutoplayToggle.hidden = reducedMotionPreference.matches;
+        if (heroPausedByUser || reducedMotionPreference.matches || document.hidden ||
+            hero.offsetParent === null || hero.matches(":hover") || hero.contains(document.activeElement)) return;
+        heroTimer = window.setInterval(() => showHeroSlide(activeHeroSlide + 1), 6000);
+      }
+
+      heroAutoplayToggle.addEventListener("click", () => {
+        heroPausedByUser = !heroPausedByUser;
+        heroAutoplayToggle.setAttribute("aria-pressed", String(heroPausedByUser));
+        heroAutoplayToggle.setAttribute("aria-label", heroPausedByUser ? "Resume automatic slide rotation" : "Pause automatic slide rotation");
+        heroAutoplayToggle.textContent = heroPausedByUser ? "▶" : "Ⅱ";
+        if (heroPausedByUser) stopHeroAutoplay();
+        else startHeroAutoplay();
+      });
+      hero.querySelector(".hero-control-prev").addEventListener("click", () => {
+        showHeroSlide(activeHeroSlide - 1);
+        startHeroAutoplay();
+      });
+      hero.querySelector(".hero-control-next").addEventListener("click", () => {
+        showHeroSlide(activeHeroSlide + 1);
+        startHeroAutoplay();
+      });
+      heroDots.forEach((dot, index) => dot.addEventListener("click", () => {
+        showHeroSlide(index);
+        startHeroAutoplay();
+      }));
+      hero.addEventListener("pointerenter", stopHeroAutoplay);
+      hero.addEventListener("pointerleave", startHeroAutoplay);
+      hero.addEventListener("focusin", stopHeroAutoplay);
+      hero.addEventListener("focusout", (event) => {
+        if (!hero.contains(event.relatedTarget)) startHeroAutoplay();
+      });
+      document.addEventListener("visibilitychange", startHeroAutoplay);
+      reducedMotionPreference.addEventListener("change", startHeroAutoplay);
+      startHeroAutoplay();
+    });
+
+    function showLoginRecoveryForm(form) {
+      loginForm.hidden = form !== loginForm;
+      forgotPasswordForm.hidden = form !== forgotPasswordForm;
+      resetPasswordForm.hidden = form !== resetPasswordForm;
+    }
+
+    async function api(path, options = {}) {
+      const headers = { Accept: "application/json", ...options.headers };
+      if (options.body) headers["Content-Type"] = "application/json";
+      if (options.method && options.method !== "GET" && csrfToken) headers["X-CSRF-Token"] = csrfToken;
+      const response = await fetch(path, { ...options, headers, credentials: "same-origin", cache: "no-store" });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
+      return payload;
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedCategories = categoryInputs.filter((input) => input.checked && input.value !== "all").map((input) => input.value);
+      const selectedWeights = weightInputs.filter((input) => input.checked).map((input) => input.value);
+      const minPrice = document.querySelector("#minPrice").value;
+      const maxPrice = document.querySelector("#maxPrice").value;
+      let visible = 0;
+
+      for (const card of cards) {
+        const price = Number(card.dataset.price);
+        const matchesSearch = card.dataset.name.toLowerCase().includes(query);
+        const matchesCategory = !selectedCategories.length || selectedCategories.includes(card.dataset.category);
+        const matchesWeight = !selectedWeights.length || selectedWeights.includes(card.dataset.weight);
+        const matchesMin = minPrice === "" || price >= Number(minPrice);
+        const matchesMax = maxPrice === "" || price <= Number(maxPrice);
+        card.hidden = !(matchesSearch && matchesCategory && matchesWeight && matchesMin && matchesMax);
+        if (!card.hidden) visible++;
+      }
+
+      let empty = grid.querySelector(".empty-state");
+      if (visible === 0 && !empty) {
+        empty = document.createElement("p");
+        empty.className = "empty-state";
+        empty.textContent = "No vegetables match those filters. Try changing your search.";
+        grid.append(empty);
+      } else if (visible > 0 && empty) {
+        empty.remove();
+      }
+      countLabel.textContent = `${visible} fresh ${visible === 1 ? "find" : "finds"}`;
+    }
+
+    function updateBagCount() {
+      const count = [...cart.values()].reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = count;
+      cartButton.setAttribute("aria-label", `Shopping bag, ${count} ${count === 1 ? "item" : "items"}`);
+    }
+
+    function renderCart() {
+        const items = [...cart.values()];
+        cartLines.innerHTML = items.length ? items.map((item) => `
+          <div class="cart-line">
+            <span class="cart-line-name">${escapeHTML(item.name)}</span>
+            <span class="cart-line-qty">
+              <button type="button" data-cart-id="${escapeHTML(item.id)}" data-cart-step="-1" aria-label="Remove one ${escapeHTML(item.name)}">−</button>
+              ${item.quantity}
+              <button type="button" data-cart-id="${escapeHTML(item.id)}" data-cart-step="1" aria-label="Add one ${escapeHTML(item.name)}">+</button>
+            </span>
+            <span class="cart-line-price">₹${item.price * item.quantity}</span>
+          </div>`).join("") : '<p class="empty-state">Your basket is empty. Add some fresh vegetables to get started.</p>';
+        const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        document.querySelector("#cartTotal").textContent = `₹${total}`;
+        checkoutLogin.hidden = !items.length || Boolean(customer);
+        checkoutForm.hidden = !items.length || !customer;
+        if (customer) {
+          checkoutForm.elements.phone.value = customer.phone || "";
+          checkoutForm.elements.address.value = customer.address || "";
+        }
+    }
+
+    function renderProducts(products) {
+        grid.innerHTML = products.map((product) => `
+          <article class="product-card" data-id="${escapeHTML(product.id)}" data-name="${escapeHTML(product.name)}"
+                   data-category="${escapeHTML(product.category)}" data-price="${product.price}"
+                   data-weight="${escapeHTML((product.unit.toLowerCase().match(/\d+\s*(?:gm|kg|bunch)/) || [""])[0].replace(/\s+/g, ""))}" data-order="${product.sort_order}"
+                   data-stock="${product.stock}">
+            <div class="product-image">
+              ${product.image_url ? `<img src="${escapeHTML(product.image_url)}" alt="${escapeHTML(product.name)}" loading="lazy">` : ""}
+              ${product.discount ? `<span class="discount">${escapeHTML(product.discount)}</span>` : ""}
+              <button class="favorite" type="button" aria-label="Add ${escapeHTML(product.name)} to favourites" aria-pressed="false">♡</button>
+            </div>
+            <div class="product-details">
+              <h2 class="product-name">${escapeHTML(product.name)}</h2>
+              <div class="product-prices"><span class="price">₹${product.price}</span>
+                ${product.old_price !== null ? `<span class="old-price">₹${product.old_price}</span>` : ""}
+              </div>
+              <p class="product-unit">${escapeHTML(product.unit)}${product.stock === 0 ? " · Out of stock" : ""}</p>
+              <button class="add-button" type="button" ${product.stock === 0 ? "disabled" : ""}>${product.stock === 0 ? "Out of stock" : "+ Add"}</button>
+            </div>
+          </article>`).join("");
+        cards = [...grid.querySelectorAll(".product-card")];
+        grid.setAttribute("aria-busy", "false");
+        const requestedCategory = new URLSearchParams(window.location.search).get("category");
+        if (requestedCategory && categoryInputs.some((input) => input.value === requestedCategory)) {
+          categoryInputs.forEach((input) => { input.checked = input.value === requestedCategory; });
+        }
+        applyFilters();
+    }
+
+    async function loadProducts() {
+        try {
+          const result = await api("/api/products");
+          renderProducts(result.products);
+        } catch (error) {
+          countLabel.textContent = `Unable to load products: ${error.message}`;
+          grid.innerHTML = '<p class="empty-state">The shop could not load its product catalog. Check that the Fresh Vegbox server is running.</p>';
+          grid.setAttribute("aria-busy", "false");
+        }
+    }
+
+    function resetFilters() {
+      searchInput.value = "";
+      categoryInputs.forEach((input) => { input.checked = input.value === "all"; });
+      weightInputs.forEach((input) => { input.checked = false; });
+      document.querySelector("#minPrice").value = "";
+      document.querySelector("#maxPrice").value = "";
+      document.querySelector("#sortProducts").value = "newest";
+      cards.sort((a, b) => Number(a.dataset.order) - Number(b.dataset.order)).forEach((card) => grid.append(card));
+      applyFilters();
+    }
+
+    function selectAccountTab(tabId) {
+      for (const tab of dialogTabs) {
+        const selected = tab.id === tabId;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        document.querySelector(`#${tab.getAttribute("aria-controls")}`).hidden = !selected;
+      }
+      if (tabId === "loginTab") showLoginRecoveryForm(loginForm);
+    }
+
+    if (document.documentElement.dataset.page === "signin" || document.documentElement.dataset.page === "signup") {
+      selectAccountTab(document.documentElement.dataset.page === "signup" ? "signupTab" : "loginTab");
+      accountDialog.showModal();
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    [...categoryInputs, ...weightInputs].forEach((input) => {
+      input.addEventListener("change", () => {
+        if (input.name === "category" && input.value === "all" && input.checked) {
+          categoryInputs.forEach((category) => { if (category !== input) category.checked = false; });
+        } else if (input.name === "category" && input.value !== "all" && input.checked) {
+          categoryInputs.find((category) => category.value === "all").checked = false;
+        } else if (input.name === "category" && !categoryInputs.some((category) => category.checked && category.value !== "all")) {
+          categoryInputs.find((category) => category.value === "all").checked = true;
+        }
+        applyFilters();
+      });
+    });
+
+    document.querySelector("#applyPrice").addEventListener("click", applyFilters);
+    document.querySelectorAll("#minPrice, #maxPrice").forEach((input) => input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") applyFilters();
+    }));
+    document.querySelector("#clearFilters").addEventListener("click", resetFilters);
+    document.querySelector("#sortProducts").addEventListener("change", (event) => {
+      const sorters = {
+        newest: (a, b) => Number(a.dataset.order) - Number(b.dataset.order),
+        "price-low": (a, b) => Number(a.dataset.price) - Number(b.dataset.price),
+        "price-high": (a, b) => Number(b.dataset.price) - Number(a.dataset.price),
+        name: (a, b) => a.dataset.name.localeCompare(b.dataset.name)
+      };
+      cards.sort(sorters[event.target.value]).forEach((card) => grid.append(card));
+    });
+
+    grid.addEventListener("click", (event) => {
+      const favorite = event.target.closest(".favorite");
+      if (favorite) {
+        const isFavorite = favorite.getAttribute("aria-pressed") !== "true";
+        favorite.setAttribute("aria-pressed", String(isFavorite));
+        favorite.textContent = isFavorite ? "♥" : "♡";
+        return;
+      }
+      const addButton = event.target.closest(".add-button");
+      if (addButton) {
+        const card = addButton.closest(".product-card");
+        const item = cart.get(card.dataset.id) || {
+          id: card.dataset.id, name: card.dataset.name, price: Number(card.dataset.price), quantity: 0,
+          stock: Number(card.dataset.stock)
+        };
+        if (item.quantity >= item.stock) {
+          showToast(`Only ${item.stock} ${item.stock === 1 ? "item is" : "items are"} available.`);
+          return;
+        }
+        item.quantity++;
+        cart.set(item.id, item);
+        updateBagCount();
+        showToast(`${item.name} added to your bag`);
+      }
+    });
+
+    cartButton.addEventListener("click", () => {
+      renderCart();
+      cartDialog.showModal();
+    });
+    document.querySelector("#closeCartDialog").addEventListener("click", () => cartDialog.close());
+    cartLines.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-cart-id]");
+      if (!button) return;
+      const item = cart.get(button.dataset.cartId);
+      if (!item) return;
+      item.quantity += Number(button.dataset.cartStep);
+      if (item.quantity <= 0) cart.delete(item.id);
+      else cart.set(item.id, item);
+      updateBagCount();
+      renderCart();
+    });
+    document.querySelector("#checkoutSignIn").addEventListener("click", () => {
+      cartDialog.close();
+      selectAccountTab("loginTab");
+      accountDialog.showModal();
+    });
+    checkoutForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.querySelector("#checkoutMessage");
+      message.textContent = "";
+      const form = new FormData(checkoutForm);
+      try {
+        const order = await api("/api/orders", {
+          method: "POST",
+          body: JSON.stringify({
+            phone: form.get("phone"),
+            address: form.get("address"),
+            items: [...cart.values()].map((item) => ({ product_id: item.id, quantity: item.quantity }))
+          })
+        });
+        cart.clear();
+        updateBagCount();
+        cartDialog.close();
+        showToast(`Order placed. Your order number is ${order.id.slice(0, 8)}.`);
+        await loadProducts();
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    accountButton.addEventListener("click", () => {
+      if (!customer) {
+        window.location.assign("/signin");
+        return;
+      }
+      selectAccountTab(customer ? "subscribeTab" : "loginTab");
+      accountDialog.showModal();
+    });
+    customerSignout.addEventListener("click", async () => {
+      try {
+        await api("/api/customer/logout", { method: "POST", body: "{}" });
+        csrfToken = "";
+        await restoreCustomer();
+        renderCart();
+        accountDialog.close();
+        showToast("You have signed out.");
+      } catch (error) {
+        document.querySelector("#loginMessage").textContent = error.message;
+      }
+    });
+
+    document.querySelector("#loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formElement = event.currentTarget;
+      const message = document.querySelector("#loginMessage");
+      message.textContent = "";
+      message.classList.remove("success");
+      const form = new FormData(formElement);
+      try {
+        await api("/api/customer/login", {
+          method: "POST",
+          body: JSON.stringify({ email: form.get("email"), password: form.get("password") })
+        });
+        await restoreCustomer();
+        formElement.reset();
+        accountDialog.close();
+        showToast(`Welcome back${customer ? `, ${customer.name}` : ""}!`);
+        renderCart();
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    document.querySelector("#showForgotPassword").addEventListener("click", () => {
+      document.querySelector("#forgotPasswordForm [name=email]").value = document.querySelector("#loginForm [name=email]").value;
+      document.querySelector("#forgotPasswordMessage").textContent = "";
+      document.querySelector("#forgotPasswordMessage").classList.remove("success");
+      showLoginRecoveryForm(forgotPasswordForm);
+    });
+    document.querySelector("#backToLogin").addEventListener("click", () => showLoginRecoveryForm(loginForm));
+    document.querySelector("#requestAnotherOtp").addEventListener("click", () => {
+      document.querySelector("#forgotPasswordForm [name=email]").value = resetPasswordForm.elements.email.value;
+      document.querySelector("#forgotPasswordMessage").textContent = "";
+      document.querySelector("#forgotPasswordMessage").classList.remove("success");
+      resetPasswordForm.elements.otp.value = "";
+      showLoginRecoveryForm(forgotPasswordForm);
+    });
+    forgotPasswordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.querySelector("#forgotPasswordMessage");
+      message.textContent = "";
+      message.classList.remove("success");
+      const form = new FormData(forgotPasswordForm);
+      try {
+        const result = await api("/api/customer/password-reset-request", {
+          method: "POST",
+          body: JSON.stringify({ email: form.get("email") })
+        });
+        message.textContent = result.message;
+        message.classList.add("success");
+        resetPasswordForm.elements.email.value = form.get("email");
+        resetPasswordForm.elements.otp.value = "";
+        const resetMessage = document.querySelector("#resetPasswordMessage");
+        resetMessage.textContent = result.message;
+        resetMessage.classList.add("success");
+        showLoginRecoveryForm(resetPasswordForm);
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+    resetPasswordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.querySelector("#resetPasswordMessage");
+      message.textContent = "";
+      message.classList.remove("success");
+      const form = new FormData(resetPasswordForm);
+      if (form.get("password") !== form.get("confirm_password")) {
+        message.textContent = "Passwords do not match.";
+        return;
+      }
+      try {
+        const result = await api("/api/customer/password-reset", {
+          method: "POST",
+          body: JSON.stringify({
+            email: form.get("email"), otp: form.get("otp"), password: form.get("password")
+          })
+        });
+        document.querySelector("#loginMessage").textContent = result.message;
+        document.querySelector("#loginMessage").classList.add("success");
+        resetPasswordForm.reset();
+        showLoginRecoveryForm(loginForm);
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    document.querySelector("#signupForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formElement = event.currentTarget;
+      const message = document.querySelector("#signupMessage");
+      message.textContent = "";
+      const form = new FormData(formElement);
+      try {
+        await api("/api/customer/signup", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.get("name"), email: form.get("email"), phone: form.get("phone"), password: form.get("password")
+          })
+        });
+        await restoreCustomer();
+        formElement.reset();
+        accountDialog.close();
+        showToast("Your Fresh Vegbox account is ready.");
+        renderCart();
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+    document.querySelectorAll(".subscription-link").forEach((link) => link.addEventListener("click", (event) => {
+      event.preventDefault();
+      selectAccountTab("subscribeTab");
+      accountDialog.showModal();
+    }));
+    dialogTabs.forEach((tab) => tab.addEventListener("click", () => selectAccountTab(tab.id)));
+    document.querySelector("#closeAccountDialog").addEventListener("click", () => accountDialog.close());
+    accountDialog.addEventListener("click", (event) => {
+      if (event.target === accountDialog) accountDialog.close();
+    });
+    document.querySelector("#subscriptionForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formElement = event.currentTarget;
+      const form = new FormData(formElement);
+      const message = document.querySelector("#subscriptionMessage");
+      message.textContent = "";
+      try {
+        await api("/api/subscriptions", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.get("name"), phone: form.get("phone"), email: form.get("email"),
+            plan_id: form.get("plan_id"), address: form.get("address")
+          })
+        });
+        formElement.reset();
+        accountDialog.close();
+        showToast("Subscription request saved. The shop will confirm delivery details.");
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    async function loadSubscriptionPlans() {
+      const select = document.querySelector("#subscriptionPlanSelect");
+      const submit = document.querySelector("#subscriptionForm .form-submit");
+      const details = document.querySelector("#subscriptionPlanDetails");
+      try {
+        const { plans } = await api("/api/subscription-plans");
+        select.innerHTML = plans.length
+          ? `<option value="">Select a plan</option>${plans.map((plan) =>
+              `<option value="${escapeHTML(plan.id)}">${escapeHTML(plan.name)} · ₹${plan.price} / ${escapeHTML(plan.frequency)}</option>`
+            ).join("")}`
+          : '<option value="">No plans are available yet</option>';
+        submit.disabled = plans.length === 0;
+        details.textContent = plans.length
+          ? "Free delivery up to 3 km. The shop will confirm your request."
+          : "Subscription plans have not been added yet. Please check back later.";
+      } catch (error) {
+        select.innerHTML = '<option value="">Plans could not be loaded</option>';
+        submit.disabled = true;
+        details.textContent = error.message;
+      }
+    }
+
+    async function restoreCustomer() {
+      const session = await api("/api/me");
+      csrfToken = session.csrf || "";
+      customer = session.authenticated && session.role === "customer" ? session.user : null;
+      const label = accountButton.querySelector(".account-label");
+      label.textContent = customer ? customer.name.split(" ")[0] : "Account";
+      accountButton.setAttribute("aria-label", customer ? `Signed in as ${customer.name}` : "Account");
+      customerSignout.hidden = !customer;
+      return customer;
+    }
+
+    restoreCustomer().then(() => renderCart()).catch((error) => {
+      showToast(`Unable to restore account: ${error.message}`);
+    });
+    applyFilters();
+    loadProducts();
+    loadSubscriptionPlans();
+  </script>
+</body>
+</html>

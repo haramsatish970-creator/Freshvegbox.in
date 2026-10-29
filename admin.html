@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#315b17">
+  <title>Admin — Fresh Vegbox</title>
+  <link rel="icon" type="image/png" href="/assets/fresh-vegbox-favicon.png">
+  <style>
+    :root { color-scheme: light; --green: #315b17; --dark: #24460f; --ink: #232921; --muted: #788073; --line: #e4e8df; --bg: #f5f7f2; --red: #c62828; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: var(--ink); background: var(--bg); font: 14px/1.5 Arial, sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; background: white; border-bottom: 1px solid var(--line); }
+    .brand { color: var(--green); font-size: 19px; font-weight: 700; text-decoration: none; }
+    .top-actions { display: flex; align-items: center; gap: 15px; }
+    .top-actions a { color: var(--muted); font-size: 12px; }
+    .button { min-height: 36px; padding: 8px 13px; color: white; background: var(--green); border: 0; border-radius: 6px; font-size: 12px; font-weight: 700; }
+    .button:hover { background: var(--dark); }
+    .button.secondary { color: #43523c; background: #edf2e8; }
+    .button.danger { color: white; background: var(--red); }
+    .button.small { min-height: 30px; padding: 5px 9px; }
+    main { width: min(1240px, calc(100% - 36px)); margin: 28px auto 60px; }
+    .login-card { width: min(420px, 100%); margin: 8vh auto; padding: 27px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 35px #2030150d; }
+    h1 { margin: 0; color: #273421; font-size: 25px; letter-spacing: -.5px; }
+    .subheading { margin: 5px 0 22px; color: var(--muted); font-size: 12px; }
+    .field { display: grid; gap: 5px; margin-bottom: 14px; color: #434a40; font-size: 12px; font-weight: 600; }
+    .field input, .field select, .field textarea { width: 100%; min-height: 38px; padding: 8px 10px; color: var(--ink); background: white; border: 1px solid #dfe4da; border-radius: 5px; outline: 0; font-size: 13px; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #77985e; box-shadow: 0 0 0 3px #315b1710; }
+    .field textarea { min-height: 70px; resize: vertical; }
+    .login-card .button { width: 100%; min-height: 41px; margin-top: 4px; }
+    .notice { min-height: 20px; margin: 12px 0 0; color: var(--red); font-size: 12px; }
+    .notice.success { color: var(--green); }
+    .hint { margin: 14px 0 0; padding: 10px; color: #687261; background: #f2f5ee; border-radius: 5px; font-size: 11px; }
+    [hidden] { display: none !important; }
+    .admin-heading { display: flex; align-items: end; justify-content: space-between; gap: 15px; margin-bottom: 18px; }
+    .admin-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .summary { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 11px; margin-bottom: 18px; }
+    .summary-card { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+    .summary-value { display: block; color: var(--green); font-size: 24px; font-weight: 700; }
+    .summary-label { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 14px; padding: 5px; background: #e9ede5; border-radius: 7px; overflow-x: auto; }
+    .tab { flex: 0 0 auto; padding: 9px 14px; color: #626b5b; background: transparent; border: 0; border-radius: 5px; font-size: 12px; font-weight: 600; }
+    .tab[aria-selected="true"] { color: var(--green); background: white; box-shadow: 0 1px 5px #1e2c1514; }
+    .panel { padding: 18px; background: white; border: 1px solid var(--line); border-radius: 8px; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .panel-heading h2 { margin: 0; font-size: 17px; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 10px 9px; border-bottom: 1px solid #edf0ea; text-align: left; vertical-align: middle; }
+    th { color: #727a6c; background: #f8f9f6; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    td { color: #333a30; }
+    td .muted { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .status { min-width: 116px; min-height: 32px; padding: 5px 7px; color: #41483d; background: white; border: 1px solid var(--line); border-radius: 5px; font-size: 11px; }
+    .product-thumb { width: 44px; height: 44px; object-fit: contain; background: white; border: 1px solid #edf0ea; border-radius: 5px; }
+    .stock-input { width: 70px; min-height: 31px; padding: 5px; border: 1px solid var(--line); border-radius: 4px; }
+    .product-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 12px; margin-bottom: 20px; padding: 14px; background: #f8f9f6; border: 1px solid var(--line); border-radius: 6px; }
+    .product-form .field { margin-bottom: 10px; }
+    .product-form .span-2 { grid-column: span 2; }
+    .product-form-actions { grid-column: 1 / -1; display: flex; gap: 8px; }
+    .empty { padding: 30px 12px; color: var(--muted); text-align: center; }
+    @media (max-width: 900px) { .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 600px) {
+      .topbar { padding: 12px; }
+      main { width: calc(100% - 24px); margin-top: 18px; }
+      .admin-heading { align-items: start; flex-direction: column; }
+      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .summary-card { padding: 11px; }
+      .summary-value { font-size: 21px; }
+      .panel { padding: 11px; }
+      .product-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 8px; padding: 10px; }
+      .product-form .span-2 { grid-column: span 2; }
+      th, td { padding: 8px 7px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Fresh Vegbox · Admin</a>
+    <div class="top-actions"><a href="/">View shop</a><button class="button secondary small" id="logout" type="button" hidden>Sign out</button></div>
+  </header>
+  <main>
+    <section class="login-card" id="loginCard">
+      <h1>Admin sign in</h1>
+      <p class="subheading">Sign in to manage your Fresh Vegbox shop.</p>
+      <form id="loginForm">
+        <label class="field">Username<input name="username" autocomplete="username" required maxlength="80"></label>
+        <label class="field">Password<input name="password" type="password" autocomplete="current-password" required maxlength="256"></label>
+        <button class="button" type="submit">Sign in</button>
+      </form>
+      <p class="notice" id="loginNotice" role="status" aria-live="polite"></p>
+      <p class="hint">First time here? From the project folder run <code>python server.py --setup-admin</code>. Use <strong>haramsatish970@gmail.com</strong> as the admin username, then choose your password in the private terminal prompt.</p>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="admin-heading"><div><h1>Shop administration</h1><p>Products, inventory, customer orders, and subscriptions.</p></div><span id="adminIdentity"></span></div>
+      <div class="summary" id="summary"></div>
+      <div class="tabs" role="tablist" aria-label="Admin sections">
+        <button class="tab" type="button" role="tab" aria-selected="true" data-panel="productsPanel">Products &amp; stock</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-panel="ordersPanel">Orders</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-panel="subscriptionsPanel">Subscriptions</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-panel="customersPanel">Customers</button>
+      </div>
+      <p class="notice" id="adminNotice" role="status" aria-live="polite"></p>
+      <section class="panel" id="productsPanel" role="tabpanel">
+        <div class="panel-heading"><h2>Product catalog &amp; stock</h2><button class="button small" id="newProduct" type="button">Add product</button></div>
+        <form class="product-form" id="productForm" hidden>
+          <label class="field span-2">Product name<input name="name" required maxlength="160"></label>
+          <label class="field">Category<input name="category" required maxlength="80"></label>
+          <label class="field">Price (₹)<input name="price" type="number" min="0" step="1" required></label>
+          <label class="field">Old price (₹)<input name="old_price" type="number" min="0" step="1"></label>
+          <label class="field">Stock quantity<input name="stock" type="number" min="0" step="1" value="0" required></label>
+          <label class="field">Unit<input name="unit" maxlength="80"></label>
+          <label class="field">Discount label<input name="discount" maxlength="40"></label>
+          <label class="field span-2">Online image URL<input name="image_url" type="text" inputmode="url" maxlength="2000" placeholder="https://example.com/vegetable.jpg"></label>
+          <label class="field span-2">Or upload from this computer<input name="image_file" type="file" accept="image/png,image/jpeg,image/webp"><span class="muted" id="imageUploadStatus" role="status" aria-live="polite">PNG, JPEG, or WebP · up to 5 MB</span><img class="product-thumb" id="imageUploadPreview" alt="Selected product image preview" hidden></label>
+          <label class="field"><span>Availability</span><select name="active"><option value="true">Available in shop</option><option value="false">Hidden from shop</option></select></label>
+          <div class="product-form-actions"><button class="button" type="submit">Save product</button><button class="button secondary" id="cancelProduct" type="button">Cancel</button></div>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Availability</th><th>Actions</th></tr></thead><tbody id="productsTable"></tbody></table></div>
+      </section>
+      <section class="panel" id="ordersPanel" role="tabpanel" hidden><div class="panel-heading"><h2>Customer orders</h2></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Delivery address</th><th>Status</th></tr></thead><tbody id="ordersTable"></tbody></table></div></section>
+      <section class="panel" id="subscriptionsPanel" role="tabpanel" hidden>
+        <div class="panel-heading"><h2>Subscription plans</h2></div>
+        <form class="product-form" id="subscriptionPlanForm">
+          <label class="field span-2">Plan name<input name="name" required maxlength="100" placeholder="Family Veg Box"></label>
+          <label class="field">Price per delivery (₹)<input name="price" type="number" min="0" step="1" required></label>
+          <label class="field">Delivery frequency<select name="frequency" required><option value="weekly">Weekly</option><option value="fortnightly">Every two weeks</option><option value="monthly">Monthly</option></select></label>
+          <p class="muted span-2">Free delivery up to 3 km.</p>
+          <div class="product-form-actions"><button class="button" type="submit">Add subscription plan</button></div>
+        </form>
+        <div class="table-wrap"><table><thead><tr><th>Plan</th><th>Price / delivery</th><th>Frequency</th><th>Delivery</th></tr></thead><tbody id="subscriptionPlansTable"></tbody></table></div>
+        <div class="panel-heading" style="margin-top:24px"><h2>Customer subscriptions</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Customer</th><th>Plan</th><th>Delivery address</th><th>Created</th><th>Status</th></tr></thead><tbody id="subscriptionsTable"></tbody></table></div>
+      </section>
+      <section class="panel" id="customersPanel" role="tabpanel" hidden><div class="panel-heading"><h2>Customers</h2></div><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Contact</th><th>Address</th><th>Orders</th><th>Subscriptions</th><th>Joined</th></tr></thead><tbody id="customersTable"></tbody></table></div></section>
+    </section>
+  </main>
+  <script>
+    let csrfToken = "";
+    let editingProductId = "";
+    let imagePreviewUrl = "";
+    const loginCard = document.querySelector("#loginCard");
+    const dashboard = document.querySelector("#dashboard");
+    const loginNotice = document.querySelector("#loginNotice");
+    const adminNotice = document.querySelector("#adminNotice");
+    const productForm = document.querySelector("#productForm");
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    async function api(path, options = {}) {
+      if (window.location.protocol !== "http:" || !["127.0.0.1", "localhost"].includes(window.location.hostname)) {
+        throw new Error("Open the admin panel from the running local shop at http://127.0.0.1:8000/admin. Do not open admin.html directly from the folder.");
+      }
+      const headers = { Accept: "application/json", ...options.headers };
+      if (options.body) headers["Content-Type"] = "application/json";
+      if (options.method && options.method !== "GET" && csrfToken) headers["X-CSRF-Token"] = csrfToken;
+      let response;
+      try {
+        response = await fetch(path, { ...options, headers, credentials: "same-origin", cache: "no-store" });
+      } catch {
+        throw new Error("The Fresh Vegbox backend is not reachable. Start it with run_server.bat, then reopen http://127.0.0.1:8000/admin.");
+      }
+      if (!response.headers.get("content-type")?.includes("application/json")) {
+        throw new Error("Admin API not found. Start the Fresh Vegbox backend and open http://127.0.0.1:8000/admin.");
+      }
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
+      return payload;
+    }
+
+    function setNotice(element, message, success = false) {
+      element.textContent = message;
+      element.classList.toggle("success", success);
+    }
+
+    function formatDate(value) {
+      return new Date(value).toLocaleString();
+    }
+
+    function emptyRow(columns, message = "Nothing here yet.") {
+      return `<tr><td class="empty" colspan="${columns}">${escapeHTML(message)}</td></tr>`;
+    }
+
+    function statusSelect(id, status, choices, endpoint) {
+      return `<select class="status" data-status-endpoint="${escapeHTML(endpoint)}" data-id="${escapeHTML(id)}">${choices.map((choice) =>
+        `<option value="${choice}"${status === choice ? " selected" : ""}>${escapeHTML(choice[0].toUpperCase() + choice.slice(1))}</option>`
+      ).join("")}</select>`;
+    }
+
+    async function loadProducts() {
+      const { products } = await api("/api/admin/products");
+      document.querySelector("#productsTable").innerHTML = products.length ? products.map((product) => `
+        <tr data-product-id="${escapeHTML(product.id)}">
+          <td>${product.image_url ? `<img class="product-thumb" src="${escapeHTML(product.image_url)}" alt="" loading="lazy">` : ""}
+            <strong>${escapeHTML(product.name)}</strong><span class="muted">${escapeHTML(product.unit || "")}</span></td>
+          <td>${escapeHTML(product.category)}</td><td>₹${product.price}</td>
+          <td><input class="stock-input" type="number" min="0" step="1" value="${product.stock}" aria-label="Stock for ${escapeHTML(product.name)}"></td>
+          <td>${product.active ? "Available" : "Hidden"}</td>
+          <td><button class="button secondary small edit-product" type="button">Edit</button>
+              <button class="button small save-stock" type="button">Save stock</button>
+              <button class="button danger small remove-product" type="button">${product.active ? "Hide" : "Remove"}</button></td>
+        </tr>`).join("") : emptyRow(6);
+    }
+
+    async function loadOrders() {
+      const { orders } = await api("/api/admin/orders");
+      document.querySelector("#ordersTable").innerHTML = orders.length ? orders.map((order) => `
+        <tr><td><strong>${escapeHTML(order.id.slice(0, 8))}</strong><span class="muted">${formatDate(order.created_at)}</span></td>
+        <td>${escapeHTML(order.customer_name)}<span class="muted">${escapeHTML(order.customer_email)} · ${escapeHTML(order.customer_phone)}</span></td>
+        <td>${order.items.map((item) => `${escapeHTML(item.product_name)} × ${item.quantity}`).join("<br>")}</td>
+        <td>₹${order.total}</td><td>${escapeHTML(order.address)}</td>
+        <td>${statusSelect(order.id, order.status, ["pending", "confirmed", "packed", "delivered", "cancelled"], `/api/admin/orders/${order.id}`)}</td></tr>`
+      ).join("") : emptyRow(6, "No orders have been placed.");
+    }
+
+    async function loadSubscriptions() {
+      const { subscriptions } = await api("/api/admin/subscriptions");
+      document.querySelector("#subscriptionsTable").innerHTML = subscriptions.length ? subscriptions.map((subscription) => `
+        <tr><td>${escapeHTML(subscription.customer_name)}<span class="muted">${escapeHTML(subscription.customer_email)} · ${escapeHTML(subscription.customer_phone)}</span></td>
+        <td>${escapeHTML(subscription.plan_name || subscription.box_size)}<span class="muted">${escapeHTML(subscription.frequency)}${subscription.plan_price !== null ? ` · ₹${subscription.plan_price}` : ""}</span></td>
+        <td>${escapeHTML(subscription.address)}</td><td>${formatDate(subscription.created_at)}</td>
+        <td>${statusSelect(subscription.id, subscription.status, ["pending", "active", "paused", "cancelled"], `/api/admin/subscriptions/${subscription.id}`)}</td></tr>`
+      ).join("") : emptyRow(5, "No subscriptions yet.");
+    }
+
+    async function loadSubscriptionPlans() {
+      const { plans } = await api("/api/admin/subscription-plans");
+      document.querySelector("#subscriptionPlansTable").innerHTML = plans.length ? plans.map((plan) => `
+        <tr><td>${escapeHTML(plan.name)}</td><td>₹${plan.price}</td>
+        <td>${escapeHTML(plan.frequency)}</td><td>${escapeHTML(plan.delivery_note)}</td></tr>`
+      ).join("") : emptyRow(4, "No subscription plans yet.");
+    }
+
+    async function loadCustomers() {
+      const { customers } = await api("/api/admin/customers");
+      document.querySelector("#customersTable").innerHTML = customers.length ? customers.map((customer) => `
+        <tr><td>${escapeHTML(customer.name)}</td>
+        <td>${escapeHTML(customer.email)}<span class="muted">${escapeHTML(customer.phone)}</span></td>
+        <td>${escapeHTML(customer.address)}</td><td>${customer.order_count}</td>
+        <td>${customer.subscription_count}</td><td>${formatDate(customer.created_at)}</td></tr>`
+      ).join("") : emptyRow(6, "No customers yet.");
+    }
+
+    async function loadDashboard() {
+      const summary = await api("/api/admin/summary");
+      const labels = { products: "Active products", low_stock: "Low-stock items", orders: "Orders", pending_orders: "Pending orders", subscriptions: "Subscriptions", customers: "Customers" };
+      document.querySelector("#summary").innerHTML = Object.entries(labels).map(([key, label]) =>
+        `<div class="summary-card"><span class="summary-value">${summary[key]}</span><span class="summary-label">${label}</span></div>`
+      ).join("");
+      await Promise.all([loadProducts(), loadOrders(), loadSubscriptions(), loadSubscriptionPlans(), loadCustomers()]);
+    }
+
+    function showDashboard(username) {
+      loginCard.hidden = true;
+      dashboard.hidden = false;
+      document.querySelector("#logout").hidden = false;
+      document.querySelector("#adminIdentity").textContent = `Signed in as ${username}`;
+    }
+
+    function resetProductForm() {
+      editingProductId = "";
+      productForm.reset();
+      clearImagePreview();
+      productForm.elements.stock.value = "0";
+      productForm.elements.active.value = "true";
+      document.querySelector("#imageUploadStatus").textContent = "PNG, JPEG, or WebP · up to 5 MB";
+      productForm.hidden = true;
+    }
+
+    function clearImagePreview() {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      imagePreviewUrl = "";
+      const preview = document.querySelector("#imageUploadPreview");
+      preview.onerror = null;
+      preview.removeAttribute("src");
+      preview.hidden = true;
+    }
+
+    document.querySelector("#loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setNotice(loginNotice, "");
+      const form = new FormData(event.currentTarget);
+      try {
+        const result = await api("/api/admin/login", {
+          method: "POST",
+          body: JSON.stringify({ username: form.get("username"), password: form.get("password") })
+        });
+        csrfToken = result.csrf;
+        showDashboard(result.name);
+        await loadDashboard();
+      } catch (error) {
+        setNotice(loginNotice, error.message);
+      }
+    });
+
+    document.querySelector("#logout").addEventListener("click", async () => {
+      try {
+        await api("/api/admin/logout", { method: "POST", body: "{}" });
+        csrfToken = "";
+        dashboard.hidden = true;
+        loginCard.hidden = false;
+        document.querySelector("#logout").hidden = true;
+        document.querySelector("#loginForm").reset();
+        setNotice(loginNotice, "Signed out.", true);
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+      }
+    });
+
+    document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((candidate) => {
+        const selected = candidate === tab;
+        candidate.setAttribute("aria-selected", String(selected));
+        document.querySelector(`#${candidate.dataset.panel}`).hidden = !selected;
+      });
+    }));
+
+    document.querySelector("#newProduct").addEventListener("click", () => {
+      resetProductForm();
+      productForm.hidden = false;
+      productForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    document.querySelector("#cancelProduct").addEventListener("click", resetProductForm);
+    document.querySelector("#subscriptionPlanForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      try {
+        await api("/api/admin/subscription-plans", {
+          method: "POST",
+          body: JSON.stringify({
+            name: data.get("name"),
+            price: Number(data.get("price")),
+            frequency: data.get("frequency")
+          })
+        });
+        event.currentTarget.reset();
+        setNotice(adminNotice, "Subscription plan added.", true);
+        await loadSubscriptionPlans();
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+      }
+    });
+    productForm.elements.image_file.addEventListener("change", (event) => {
+      const file = event.currentTarget.files[0];
+      clearImagePreview();
+      document.querySelector("#imageUploadStatus").textContent = file
+        ? `${file.name} · ${(file.size / (1024 * 1024)).toFixed(2)} MB`
+        : "PNG, JPEG, or WebP · up to 5 MB";
+      if (file) {
+        imagePreviewUrl = URL.createObjectURL(file);
+        const preview = document.querySelector("#imageUploadPreview");
+        preview.src = imagePreviewUrl;
+        preview.hidden = false;
+        preview.onerror = () => {
+          preview.hidden = true;
+          document.querySelector("#imageUploadStatus").textContent = "Could not preview this file. Choose a PNG, JPEG, or WebP image.";
+        };
+      }
+    });
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = new FormData(productForm);
+      const selectedImage = data.get("image_file");
+      const payload = {
+        name: data.get("name"), category: data.get("category"), price: Number(data.get("price")),
+        old_price: data.get("old_price") ? Number(data.get("old_price")) : null,
+        unit: data.get("unit"), discount: data.get("discount"), image_url: data.get("image_url"),
+        stock: Number(data.get("stock")), active: data.get("active") === "true"
+      };
+      try {
+        if (selectedImage instanceof File && selectedImage.size > 0) {
+          if (selectedImage.size > 5 * 1024 * 1024) throw new Error("Choose an image that is 5 MB or smaller.");
+          if (!window.confirm(`Upload "${selectedImage.name}" (${(selectedImage.size / (1024 * 1024)).toFixed(2)} MB) as this product's image?`)) {
+            return;
+          }
+          document.querySelector("#imageUploadStatus").textContent = "Uploading image…";
+          const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.addEventListener("load", () => resolve(reader.result));
+            reader.addEventListener("error", () => reject(new Error("The selected image could not be read.")));
+            reader.readAsDataURL(selectedImage);
+          });
+          const uploaded = await api("/api/admin/images", {
+            method: "POST",
+            body: JSON.stringify({ data_url: dataUrl })
+          });
+          payload.image_url = uploaded.image_url;
+          document.querySelector("#imageUploadStatus").textContent = "Image uploaded successfully.";
+        }
+        await api(editingProductId ? `/api/admin/products/${editingProductId}` : "/api/admin/products", {
+          method: editingProductId ? "PUT" : "POST", body: JSON.stringify(payload)
+        });
+        resetProductForm();
+        setNotice(adminNotice, "Product saved.", true);
+        await Promise.all([loadProducts(), loadDashboardSummary()]);
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+      }
+    });
+
+    async function loadDashboardSummary() {
+      const summary = await api("/api/admin/summary");
+      const labels = { products: "Active products", low_stock: "Low-stock items", orders: "Orders", pending_orders: "Pending orders", subscriptions: "Subscriptions", customers: "Customers" };
+      document.querySelector("#summary").innerHTML = Object.entries(labels).map(([key, label]) =>
+        `<div class="summary-card"><span class="summary-value">${summary[key]}</span><span class="summary-label">${label}</span></div>`
+      ).join("");
+    }
+
+    document.querySelector("#productsTable").addEventListener("click", async (event) => {
+      const row = event.target.closest("tr[data-product-id]");
+      if (!row) return;
+      const productId = row.dataset.productId;
+      try {
+        if (event.target.closest(".edit-product")) {
+          const { products } = await api("/api/admin/products");
+          const product = products.find((item) => item.id === productId);
+          if (!product) throw new Error("Product no longer exists.");
+          editingProductId = product.id;
+          productForm.elements.image_file.value = "";
+          clearImagePreview();
+          document.querySelector("#imageUploadStatus").textContent = "PNG, JPEG, or WebP · up to 5 MB";
+          for (const field of ["name", "category", "price", "old_price", "unit", "discount", "image_url", "stock"]) {
+            productForm.elements[field].value = product[field] ?? "";
+          }
+          productForm.elements.active.value = String(product.active);
+          productForm.hidden = false;
+          productForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else if (event.target.closest(".save-stock")) {
+          const { products } = await api("/api/admin/products");
+          const product = products.find((item) => item.id === productId);
+          if (!product) throw new Error("Product no longer exists.");
+          product.stock = Number(row.querySelector(".stock-input").value);
+          await api(`/api/admin/products/${productId}`, { method: "PUT", body: JSON.stringify(product) });
+          setNotice(adminNotice, "Stock updated.", true);
+          await Promise.all([loadProducts(), loadDashboardSummary()]);
+        } else if (event.target.closest(".remove-product")) {
+          if (!window.confirm("Hide this product from the customer shop? Existing orders will be kept.")) return;
+          await api(`/api/admin/products/${productId}`, { method: "DELETE" });
+          setNotice(adminNotice, "Product hidden from the shop.", true);
+          await Promise.all([loadProducts(), loadDashboardSummary()]);
+        }
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+      }
+    });
+
+    document.querySelector("#ordersTable").addEventListener("change", async (event) => {
+      const select = event.target.closest("[data-status-endpoint]");
+      if (!select) return;
+      try {
+        await api(select.dataset.statusEndpoint, { method: "PUT", body: JSON.stringify({ status: select.value }) });
+        setNotice(adminNotice, "Order status updated.", true);
+        await Promise.all([loadOrders(), loadDashboardSummary()]);
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+        await loadOrders();
+      }
+    });
+
+    document.querySelector("#subscriptionsTable").addEventListener("change", async (event) => {
+      const select = event.target.closest("[data-status-endpoint]");
+      if (!select) return;
+      try {
+        await api(select.dataset.statusEndpoint, { method: "PUT", body: JSON.stringify({ status: select.value }) });
+        setNotice(adminNotice, "Subscription status updated.", true);
+        await Promise.all([loadSubscriptions(), loadDashboardSummary()]);
+      } catch (error) {
+        setNotice(adminNotice, error.message);
+        await loadSubscriptions();
+      }
+    });
+
+    async function restoreSession() {
+      try {
+        const session = await api("/api/me");
+        if (session.authenticated && session.role === "admin") {
+          csrfToken = session.csrf;
+          showDashboard(session.user.username);
+          await loadDashboard();
+        }
+      } catch (error) {
+        setNotice(loginNotice, `Unable to check your sign-in: ${error.message}`);
+      }
+    }
+
+    restoreSession();
+  </script>
+</body>
+</html>
